@@ -6,6 +6,24 @@ sources:
     schema: BRONZE
     tables:
       - name: MATILLION_SCHEDULES
+        columns:
+          - name: NAME
+            tests:
+              - unique
+              - not_null
+          - name: JOBNAME
+            tests:
+              - not_null
+          - name: HOUR
+            tests:
+              - not_null
+          - name: MINUTE
+            tests:
+              - not_null
+          - name: IGNOREMISFIRES
+            tests:
+              - accepted_values:
+                  values: ['TRUE', 'FALSE']
   - name: DBT
     database: DBT_DB_DEV
     schema: BRONZE
