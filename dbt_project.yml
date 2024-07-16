@@ -40,3 +40,10 @@ models:
   dbt_artifacts:
     +database: DBT_DB_DEV # optional, default is your target database
     +schema: DBT_ARTIFACT_LOGGING # optional, default is your target schema
+
+tests:
+  my_new_project:
+    +store_failures: true  # all tests
+    +severity: warn  # all tests
+    +database: DBT_DB_DEV
+    +schema: DBT_ARTIFACT_LOGGING
