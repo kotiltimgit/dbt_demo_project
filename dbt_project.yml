@@ -1,7 +1,7 @@
 # Name your project! Project names should contain only lowercase characters
 # and underscores. A good package name should reflect your organization's
 # name or the intended use of these models
-name: "my_new_project"
+name: "dbt_demo_project"
 version: "1.0.0"
 config-version: 2
 
@@ -42,8 +42,7 @@ models:
     +schema: DBT_ARTIFACT_LOGGING # optional, default is your target schema
 
 tests:
-  my_new_project:
+  dbt_demo_project:
     +store_failures: true  # all tests
     +severity: warn  # all tests
     +database: DBT_DB_DEV
-    +schema: DBT_ARTIFACT_LOGGING
