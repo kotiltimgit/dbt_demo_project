@@ -40,6 +40,9 @@ models:
   dbt_artifacts:
     +database: DBT_DB_DEV # optional, default is your target database
     +schema: DBT_ARTIFACT_LOGGING # optional, default is your target schema
+  elementary:
+    +database: DBT_DB_DEV 
+    +schema: DBT_ELEMENTARY_LOGGING
 
 tests:
   dbt_demo_project:
