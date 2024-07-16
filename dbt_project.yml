@@ -25,6 +25,15 @@ clean-targets:         # directories to be removed by `dbt clean`
   - "dbt_packages"
 
 
+# Configuring tests
+# Full documentation: https://docs.getdbt.com/reference/data-test-configs
+tests:
+  my_new_project:
+    +store_failures: true  # all tests
+    +severity: warn  # all tests
+    +database: DBT_DB_DEV
+    +schema: DBT_ARTIFACT_LOGGING
+
 # Configuring models
 # Full documentation: https://docs.getdbt.com/docs/configuring-models
 
