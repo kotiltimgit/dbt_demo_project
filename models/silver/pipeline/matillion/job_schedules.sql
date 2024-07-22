@@ -1,9 +1,12 @@
 {{
     config(
-        materialized='table',
+        materialized='custom_merge_material',
+        alias='JOB_SCHEDULES',
         database='DBT_DB_DEV',
         schema='SILVER',
-        alias='JOB_SCHEDULES'
+        unique_key=['PLATFORM_NAME','SCHEDULE_NAME','JOB_NAME'],
+        exclude_update=['JOB_SCHEDULE_ID','INSERTED_BY','INSERT_DATE'],
+        exclude_insert=['JOB_SCHEDULE_ID']
     )
 }}
 
@@ -14,6 +17,8 @@ SELECT
   'ORCHESTRATION' AS "JOB_TYPE" ,
   "ENVIRONMENTNAME",
   "VERSIONNAME",
+  NULL AS PROJECTNAME,
+  NULL AS COMMAND_DETAILS,
   "ENABLED", 
   "DAYSOFMONTH",
   "DAYOFWEEK", 
@@ -26,10 +31,17 @@ SELECT
   "SATURDAY", 
   "HOUR", 
   "MINUTE",
+  NULL AS INTERVAL,
+  NULL AS FREQUENCY, 
   "TIMEZONE",  
+  NULL AS CRON_SCHEDULE,
+  NULL AS CREATED, 
+  NULL AS LASTALTERED,
+  NULL AS DELETED, 
+  NULL AS IS_AUTOINGEST_ENABLED,
   CURRENT_USER() AS "INSERTED_BY", 
   CURRENT_USER() AS "UPDATED_BY", 
-
+  NULL AS COMMENTS,
   current_timestamp() AS "INSERT_DATE", 
   current_timestamp() AS "UPDATE_DATE", 
 FROM {{ source('MATILLION', 'MATILLION_SCHEDULES') }}
