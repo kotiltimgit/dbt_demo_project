@@ -1,0 +1,14 @@
+version: 2
+
+sources:
+  - name: DBT_API_METADATA
+    database: DBT_DB_DEV
+    schema: DBT_API_METADATA
+    tables:
+      - name: DBT_ACCOUNTS
+      - name: DBT_PROJECTS
+      - name: DBT_ENVIRONMENTS
+      - name: DBT_JOBS
+      - name: DBT_USERS
+
+        
