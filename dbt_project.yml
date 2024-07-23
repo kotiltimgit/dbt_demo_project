@@ -2,7 +2,7 @@
 # and underscores. A good package name should reflect your organization's
 # name or the intended use of these models
 name: "dbt_demo_project"
-version: "1.0.0"
+version: "1.8.0"
 config-version: 2
 
 # This setting configures which "profile" dbt uses for this project.
@@ -49,3 +49,8 @@ tests:
     +store_failures: true  # all tests
     +severity: warn  # all tests
     +database: DBT_DB_DEV
+
+vars:
+  dbt_demo_project:
+    ENABLED_FLAG: false
+    PLATFORM_NAME: "default"

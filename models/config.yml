@@ -1,0 +1,6 @@
+version: 2
+
+models:
+  - name: dbt_schedules_test
+    config:
+      platform_name: "{{ var('PLATFORM_NAME') }}"
