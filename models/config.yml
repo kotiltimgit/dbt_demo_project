@@ -4,3 +4,6 @@ models:
   - name: dbt_schedules_test
     config:
       platform_name: "{{ var('PLATFORM_NAME') }}"
+  - name: vw_job_schedules
+    config:
+      platform_name: "{{ var('PLATFORM_NAME') }}"

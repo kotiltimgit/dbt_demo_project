@@ -53,4 +53,6 @@ tests:
 vars:
   dbt_demo_project:
     ENABLED_FLAG: false
-    PLATFORM_NAME: "default"
+    PLATFORM_NAME: default
+    MAT_ALIAS_NAME: null
+    DBT_ALIAS_NAME: null
