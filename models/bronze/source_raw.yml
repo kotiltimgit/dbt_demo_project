@@ -24,9 +24,3 @@ sources:
             tests:
               - accepted_values:
                   values: ['TRUE', 'FALSE']
-  - name: DBT
-    database: DBT_DB_DEV
-    schema: BRONZE
-    tables:
-      - name: DBT_LISTRUNS
-      - name: DBT_LISTJOBS
