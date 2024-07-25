@@ -1,3 +1,5 @@
+-- depends_on: {{ ref('dbt_job_schedules') }}
+
 {{
     config(
         materialized='view',

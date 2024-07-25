@@ -36,6 +36,12 @@ on-run-end:
 # continue to be built as views. These settings can be overridden in the individual model files
 # using the `{{ config(...) }}` macro.
 
+vars:
+  dbt_demo_project:
+    MAT_ALIAS_NAME: null
+    DBT_ALIAS_NAME: null
+ 
+
 models:
   dbt_artifacts:
     +database: DBT_DB_DEV # optional, default is your target database
