@@ -6,3 +6,8 @@
  
   {% do return(load_result("custom_run_query_statement")) %}
 {% endmacro %}
+
+{% macro job_schedules_macro() %}
+  {% set Table_Name = 'JOB_SCHEDULES' %}
+  {{ Table_Name }}
+{% endmacro %}

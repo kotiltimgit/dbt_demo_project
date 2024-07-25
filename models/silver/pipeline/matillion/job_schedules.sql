@@ -1,7 +1,7 @@
 {{
     config(
         materialized='custom_merge_material',
-        alias=var('DBT_ALIAS_NAME'),
+        alias=var('MAT_ALIAS_NAME'),
         database='DBT_DB_DEV',
         schema='SILVER',
         unique_key=['PLATFORM_NAME','SCHEDULE_NAME','JOB_NAME'],

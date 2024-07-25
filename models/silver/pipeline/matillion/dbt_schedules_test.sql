@@ -1,3 +1,4 @@
+
 {{
     config(
         materialized='custom_merge_material',
