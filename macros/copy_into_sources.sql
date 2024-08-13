@@ -38,8 +38,11 @@
 
             {{ log('PRE_HOOK_' ~ loop.index ~ ' COMPLETED', info=True) }}
         {% endfor %}
-
         {{ log('PRE_HOOK EXECUTIONS END', info=True) }}
+
+    {% else %}
+        {{ log('INGESTION PRE_HOOKS NOT FOUND', info=True) }}
+
     {% endif %}
 
 {% endmacro %}
