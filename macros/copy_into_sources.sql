@@ -1,6 +1,18 @@
 {% macro loading_into_source() %}
 
-    {%- set selected_load_configs = extract_source_nodes(model) -%}
+    {%- set selected_source_nodes = [] -%}
+    {%- set model_source_nodes = model.sources -%}
+    {%- set source_node_prefix = 'source' ~ '.' ~ project_name -%}
+
+    {% for item_source_node in model_source_nodes %}
+        {%- set source_node_name = item_source_node[0] ~ '.' ~ item_source_node[1] -%}
+        {%- set source_node = source_node_prefix ~ '.' ~ source_node_name -%}
+        {%- set get_source_node = graph.sources.get(source_node) -%}
+        
+        {% do selected_source_nodes.append(get_source_node) %}
+    {% endfor %}
+
+    {%- set selected_load_configs = selected_source_nodes -%}
     {{ log(selected_load_configs, info=True) }}
     {% if selected_load_configs | length > 0 %}
         {{ log('PRE_HOOK EXECUTIONS START', info=True) }}
