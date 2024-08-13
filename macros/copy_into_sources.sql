@@ -114,3 +114,7 @@
         {% endcall %}
     {% endfor %}
 {% endmacro %}
+
+{% macro nodes_list() %}
+    {{ return(graph.nodes.get(model.unique_id)) }}
+{% endmacro %}
