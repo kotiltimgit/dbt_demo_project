@@ -2,7 +2,7 @@
 
     {%- set selected_load_configs = extract_source_nodes(model) -%}
 
-    {% if selected_load_configs %}
+    {% if selected_load_configs | length > 0 %}
         {{ log('PRE_HOOK EXECUTIONS START', info=True) }}
 
         {% for item_load_config in selected_load_configs %}
