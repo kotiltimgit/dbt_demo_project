@@ -1,0 +1,208 @@
+version: 2
+
+variables:
+  dbt_demo_project:
+    load_copy_into: false     # Override this var only for source loading
+    stage_yaml: | 
+      # stage properties
+      stages:
+          # The below properties is to map the stage config to dbt model
+          # This mapping will help to run the 'copy into' in hooks or run-start or run-end
+
+          # source properties from sources.yml
+        - model: <model_name>    # required
+          source: <source_name>    # required
+          table: <table_name>    # required
+          schema: <schema_name>    # required
+          database: <database_name>    # required
+
+          # To understand the below property
+          # Kindly refer this documentation: https://docs.snowflake.com/en/user-guide/data-load-transform
+
+          # transformation properties
+          columns:    # columns mapping for transforming data during loading
+            source_columns: all | ['<source_column_1>', '<source_column_2>', ...]
+            target_columns: all | ['<target_column_1>', '<target_column_2>', ...]
+          
+          # For configuring below properties
+          # Kindly refer this documentation: https://docs.snowflake.com/en/sql-reference/sql/copy-into-table
+
+          # external stage properties
+          external_stage: <stage_name>    # required
+          external_file_path: <file_relative_path>    # required
+          files: ['<file_name_1>', '<file_name_2>', ...]
+          pattern: <regex_pattern>
+
+          # file format properties
+          file_format:
+            format_name: <format_name>    # required
+          
+          # copy options properties
+          copy_options:
+            on_error: CONTINUE | SKIP_FILE | SKIP_FILE_<num> | 'SKIP_FILE_<number>%' | ABORT_STATEMENT
+            size_limit: <number>
+            purge: true | false
+            return_failed_only: true | false
+            match_by_column_name: CASE_SENSITIVE | CASE_INSENSITIVE | NONE
+            include_metadata:
+              # supported metadata columns: ['METADATA$FILENAME', 'METADATA$FILE_ROW_NUMBER', 'METADATA$FILE_CONTENT_KEY', 'METADATA$FILE_LAST_MODIFIED', 'METADATA$START_SCAN_TIME']
+              metadata_cols: ['<metadata_column_1>', '<metadata_column_2>', ...]
+              target_columns: ['<target_column_1>', '<target_column_2>', ...]
+            enforce_length: true | false
+            truncatecolumns: true | false
+            force: true | false
+            load_uncertain_files: true | false
+
+          # validation mode properties
+          validation_mode: RETURN_<number>_ROWS | RETURN_ERRORS | RETURN_ALL_ERRORS
+        
+        - model: <model_name>    # required
+          source: MATILLION    # required
+          table: MATILLION_SCHEDULES    # required
+          schema: <schema_name>    # required
+          database: <database_name>    # required
+
+          # To understand the below property
+          # Kindly refer this documentation: https://docs.snowflake.com/en/user-guide/data-load-transform
+
+          # transformation properties
+          columns:    # columns mapping for transforming data during loading
+            source_columns: all | ['<source_column_1>', '<source_column_2>', ...]
+            target_columns: all | ['<target_column_1>', '<target_column_2>', ...]
+          
+          # For configuring below properties
+          # Kindly refer this documentation: https://docs.snowflake.com/en/sql-reference/sql/copy-into-table
+
+          # external stage properties
+          external_stage: <stage_name>    # required
+          external_file_path: <file_relative_path>    # required
+          files: ['<file_name_1>', '<file_name_2>', ...]
+          pattern: <regex_pattern>
+
+          # file format properties
+          file_format:
+            format_name: <format_name>    # required
+          
+          # copy options properties
+          copy_options:
+            on_error: CONTINUE | SKIP_FILE | SKIP_FILE_<num> | 'SKIP_FILE_<number>%' | ABORT_STATEMENT
+            size_limit: <number>
+            purge: true | false
+            return_failed_only: true | false
+            match_by_column_name: CASE_SENSITIVE | CASE_INSENSITIVE | NONE
+            include_metadata:
+              # supported metadata columns: ['METADATA$FILENAME', 'METADATA$FILE_ROW_NUMBER', 'METADATA$FILE_CONTENT_KEY', 'METADATA$FILE_LAST_MODIFIED', 'METADATA$START_SCAN_TIME']
+              metadata_cols: ['<metadata_column_1>', '<metadata_column_2>', ...]
+              target_columns: ['<target_column_1>', '<target_column_2>', ...]
+            enforce_length: true | false
+            truncatecolumns: true | false
+            force: true | false
+            load_uncertain_files: true | false
+
+          # validation mode properties
+          validation_mode: RETURN_<number>_ROWS | RETURN_ERRORS | RETURN_ALL_ERRORS
+
+
+#-------------------------------------------------------------------------#
+#  This stage configuration YAML is created based on 'Snowflake' adapter  #
+#-------------------------------------------------------------------------#
+
+# Kindly define the proper combination of config properties to avoid unwanted error and query failure during load
+
+# stage properties
+stages:
+    # The below properties is to map the stage config to dbt model
+    # This mapping will help to run the 'copy into' in hooks or run-start or run-end
+
+    # source properties from sources.yml
+  - model: <model_name>    # required
+    source: <source_name>    # required
+    table: <table_name>    # required
+    schema: <schema_name>    # required
+    database: <database_name>    # required
+
+    # To understand the below property
+    # Kindly refer this documentation: https://docs.snowflake.com/en/user-guide/data-load-transform
+
+    # transformation properties
+    columns:    # columns mapping for transforming data during loading
+      source_columns: all | ['<source_column_1>', '<source_column_2>', ...]
+      target_columns: all | ['<target_column_1>', '<target_column_2>', ...]
+    
+    # For configuring below properties
+    # Kindly refer this documentation: https://docs.snowflake.com/en/sql-reference/sql/copy-into-table
+
+    # external stage properties
+    stage: <stage_name>    # required
+    location_path: <file_relative_path>    # required only if user hasn't included the path in the stage
+    files: ['<file_name_1>', '<file_name_2>', ...]
+    pattern: <regex_pattern>
+
+    # file format properties
+    file_format: <file_format_name>    # required
+    
+    # copy options properties
+    copy_options:
+      on_error: CONTINUE | SKIP_FILE | SKIP_FILE_<num> | 'SKIP_FILE_<number>%' | ABORT_STATEMENT
+      size_limit: <number>
+      purge: true | false
+      return_failed_only: true | false
+      match_by_column_name: CASE_SENSITIVE | CASE_INSENSITIVE | NONE
+      include_metadata:
+        # supported metadata columns: ['METADATA$FILENAME', 'METADATA$FILE_ROW_NUMBER', 'METADATA$FILE_CONTENT_KEY', 'METADATA$FILE_LAST_MODIFIED', 'METADATA$START_SCAN_TIME']
+        metadata_cols: ['<metadata_column_1>', '<metadata_column_2>', ...]
+        target_columns: ['<target_column_1>', '<target_column_2>', ...]
+      enforce_length: true | false
+      truncatecolumns: true | false
+      force: true | false
+      load_uncertain_files: true | false
+
+    # validation mode properties
+    validation_mode: RETURN_<number>_ROWS | RETURN_ERRORS | RETURN_ALL_ERRORS
+  
+  - model: <model_name>    # required
+    source: MATILLION    # required
+    table: MATILLION_SCHEDULES    # required
+    schema: <schema_name>    # required
+    database: <database_name>    # required
+
+    # To understand the below property
+    # Kindly refer this documentation: https://docs.snowflake.com/en/user-guide/data-load-transform
+
+    # transformation properties
+    columns:    # columns mapping for transforming data during loading
+      source_columns: all | ['<source_column_1>', '<source_column_2>', ...]
+      target_columns: all | ['<target_column_1>', '<target_column_2>', ...]
+    
+    # For configuring below properties
+    # Kindly refer this documentation: https://docs.snowflake.com/en/sql-reference/sql/copy-into-table
+
+    # external stage properties
+    external_stage: <stage_name>    # required
+    external_file_path: <file_relative_path>    # required
+    files: ['<file_name_1>', '<file_name_2>', ...]
+    pattern: <regex_pattern>
+
+    # file format properties
+    file_format:
+      format_name: <format_name>    # required
+    
+    # copy options properties
+    copy_options:
+      on_error: CONTINUE | SKIP_FILE | SKIP_FILE_<num> | 'SKIP_FILE_<number>%' | ABORT_STATEMENT
+      size_limit: <number>
+      purge: true | false
+      return_failed_only: true | false
+      match_by_column_name: CASE_SENSITIVE | CASE_INSENSITIVE | NONE
+      include_metadata:
+        # supported metadata columns: ['METADATA$FILENAME', 'METADATA$FILE_ROW_NUMBER', 'METADATA$FILE_CONTENT_KEY', 'METADATA$FILE_LAST_MODIFIED', 'METADATA$START_SCAN_TIME']
+        metadata_cols: ['<metadata_column_1>', '<metadata_column_2>', ...]
+        target_columns: ['<target_column_1>', '<target_column_2>', ...]
+      enforce_length: true | false
+      truncatecolumns: true | false
+      force: true | false
+      load_uncertain_files: true | false
+
+    # validation mode properties
+    validation_mode: RETURN_<number>_ROWS | RETURN_ERRORS | RETURN_ALL_ERRORS
+  
