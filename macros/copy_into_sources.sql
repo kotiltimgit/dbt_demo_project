@@ -1,7 +1,7 @@
 {% macro loading_into_source() %}
 
     {%- set selected_load_configs = extract_source_nodes(model) -%}
-
+    {{ log(selected_load_configs, info=True) }}
     {% if selected_load_configs | length > 0 %}
         {{ log('PRE_HOOK EXECUTIONS START', info=True) }}
 
