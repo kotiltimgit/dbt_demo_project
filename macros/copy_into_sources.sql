@@ -1,7 +1,7 @@
 {% macro loading_into_source() %}
     {{ log(model, info=True) }}
     {%- set selected_source_nodes = [] -%}
-    {%- set model_source_nodes = model.sources -%}
+    {%- set model_source_nodes = model.get('sources') -%}
     {{ log(model_source_nodes, info=True) }}
     {%- set source_node_prefix = 'source' ~ '.' ~ project_name -%}
 
