@@ -1,7 +1,8 @@
 {% macro loading_into_source() %}
     {{ log(model, info=True) }}
     {%- set selected_source_nodes = [] -%}
-    {%- set model_source_nodes = model.get('sources') -%}
+    {%- set model_node = graph.nodes.get(model.unique_id) -%}
+    {%- set model_source_nodes = model_node.sources -%}
     {{ log(model_source_nodes, info=True) }}
     {%- set source_node_prefix = 'source' ~ '.' ~ project_name -%}
 
