@@ -1,5 +1,6 @@
 {% macro loading_into_source() %}
     {{ log(model, info=True) }}
+    {{ log(graph.nodes.values() | list, info=True) }}
     {%- set selected_source_nodes = [] -%}
     {%- set model_node = graph.nodes.get(model.unique_id) -%}
     {%- set model_source_nodes = model_node.sources -%}
