@@ -24,7 +24,7 @@ clean-targets: # directories to be removed by `dbt clean`
   - "dbt_packages"
 
 on-run-start: 
-  - "{{ loading_into_source() }}"
+  - "{% if execute %} {{ loading_into_source() }} {% endif %}"
 
 on-run-end:
   - "{{ dbt_artifacts.upload_results(results) }}"
