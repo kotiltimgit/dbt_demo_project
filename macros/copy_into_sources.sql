@@ -1,4 +1,4 @@
-{% macro loading_into_source() %}
+{% macro loading_into_source(model) %}
 
     {%- set selected_load_configs = extract_source_nodes(model) -%}
     
@@ -50,7 +50,7 @@
 {% macro extract_source_nodes(model) %}
     
     {%- set selected_source_nodes = [] -%}
-    {{ log(elementary.get_node(model.unique_id), info=True) }}
+    
     {% if execute -%}
         {{ log('Graph --> ' ~ graph.nodes.values() | list, info=True) }}
         {%- set model_node = graph.nodes.get(model.unique_id) -%}
