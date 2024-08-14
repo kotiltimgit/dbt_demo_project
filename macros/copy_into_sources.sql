@@ -1,4 +1,4 @@
-{% macro loading_into_source(model) %}
+{% macro loading_into_source() %}
 
     {%- set selected_load_configs = extract_source_nodes(model) -%}
     
@@ -50,6 +50,7 @@
 {% macro extract_source_nodes(model_sources) %}
     
     {%- set selected_source_nodes = [] -%}
+    {%- set extracted_model_nodes = extract_nodes() -%}
     
     /*{% if execute -%}
         {{ log('Graph --> ' ~ graph.nodes.values() | list, info=True) }}
@@ -58,27 +59,36 @@
         {%- set model_node = model -%}
     {% endif -%}
     {{ log(model_node, info=True) }}*/
-    {%- set model_source_nodes = model_node.sources -%}
-    {%- set source_node_prefix = 'source' ~ '.' ~ project_name -%}
+    {% for item_model_node in extracted_model_nodes %}
+        {%- set model_source_nodes = item_model_node.sources -%}
+        {%- set source_node_prefix = 'source' ~ '.' ~ project_name -%}
 
-    {% for item_source_node in model_source_nodes %}
-        {%- set source_node_name = item_source_node[0] ~ '.' ~ item_source_node[1] -%}
-        {%- set source_node = source_node_prefix ~ '.' ~ source_node_name -%}
-        {%- set get_source_node = graph.sources.get(source_node) -%}
-        
-        {% do selected_source_nodes.append(get_source_node) %}
+        {% for item_source_node in model_source_nodes %}
+            {%- set source_node_name = item_source_node[0] ~ '.' ~ item_source_node[1] -%}
+            {%- set source_node = source_node_prefix ~ '.' ~ source_node_name -%}
+            {%- set get_source_node = graph.sources.get(source_node) -%}
+            
+            {% do selected_source_nodes.append(get_source_node) %}
+        {% endfor %}
     {% endfor %}
-
+    
     {{ return(selected_source_nodes) }}
 
 {% endmacro %}
 
 {% macro extract_nodes() %}
-{{ log(selected_resources, info=True) }}
-    /*{% for item_node in selected_resources %}
-        
-    {% endfor %}*/
+    --{{ log(selected_resources, info=True) }}
+    {%- set extracted_nodes = [] -%}
+    {% for item_selected_node in selected_resources %}
+        {% for item_graph_node in graph.nodes.values() | selectattr("unique_id", "equalto", item_selected_node) %}
+            {% if item_graph_node.sources %}
+                {% do extracted_nodes.append(item_graph_node) %}
+            {% endif %}
+        {% endfor %}
+    {% endfor %}
     
+    {{ return(extracted_nodes) }}
+
 {% endmacro %}
 
 {% macro hook_macro() %}
