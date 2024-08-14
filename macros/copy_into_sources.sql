@@ -74,9 +74,10 @@
 {% endmacro %}
 
 {% macro extract_nodes() %}
-    {% for item_node in selected_resources %}
+{{ log(selected_resources, info=True) }}
+    /*{% for item_node in selected_resources %}
         
-    {% endfor %}
+    {% endfor %}*/
     
 {% endmacro %}
 
