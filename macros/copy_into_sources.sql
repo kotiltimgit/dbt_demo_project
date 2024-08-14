@@ -47,17 +47,17 @@
 
 {% endmacro %}
 
-{% macro extract_source_nodes(model) %}
+{% macro extract_source_nodes(model_sources) %}
     
     {%- set selected_source_nodes = [] -%}
     
-    {% if execute -%}
+    /*{% if execute -%}
         {{ log('Graph --> ' ~ graph.nodes.values() | list, info=True) }}
         {%- set model_node = graph.nodes.get(model.unique_id) -%}
     {% else %}
         {%- set model_node = model -%}
     {% endif -%}
-    {{ log(model_node, info=True) }}
+    {{ log(model_node, info=True) }}*/
     {%- set model_source_nodes = model_node.sources -%}
     {%- set source_node_prefix = 'source' ~ '.' ~ project_name -%}
 
