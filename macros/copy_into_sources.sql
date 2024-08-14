@@ -90,7 +90,7 @@
 {% endmacro %}
 
 {% macro nodes_list() %}
-    {% if execute %}
+    {% if not execute %}
         {{ log("Executing", info=True) }}
         {{ return(graph.nodes.get(model.unique_id)) }}
     {% else %}
