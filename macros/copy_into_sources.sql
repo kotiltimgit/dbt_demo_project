@@ -91,8 +91,12 @@
 
 {% macro nodes_list() %}
     {% if not execute %}
+        {% set l = [] %}
         {{ log("Executing", info=True) }}
-        {{ return(graph.nodes.get(model.unique_id)) }}
+        {% for item in graph.nodes.values() | selectattr("unique_id", "equalto", model.unique_id) %}
+            {% do l.append(item) %}
+        {% endfor %}
+        {{ return(l) }}
     {% else %}
         {{ log("Not Executing", info=True) }}
     {% endif %}
