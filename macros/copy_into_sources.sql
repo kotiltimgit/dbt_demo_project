@@ -3,7 +3,7 @@
     {%- set selected_load_configs = extract_source_nodes() -%}
     
     {% if selected_load_configs %}
-        {{ log('PRE_HOOK EXECUTIONS START', info=True) }}
+        {{ log('INGESTION EXECUTIONS START', info=True) }}
 
         {% for item_load_config in selected_load_configs %}
             {%- set target_relation = item_load_config.relation_name -%}
@@ -36,12 +36,12 @@
                 ;
             {% endcall %}
 
-            {{ log('PRE_HOOK_' ~ loop.index ~ ' COMPLETED', info=True) }}
+            {{ log('INGESTION_' ~ loop.index ~ ' COMPLETED', info=True) }}
         {% endfor %}
-        {{ log('PRE_HOOK EXECUTIONS END', info=True) }}
+        {{ log('INGESTION EXECUTIONS END', info=True) }}
 
     {% else %}
-        {{ log('INGESTION PRE_HOOKS NOT FOUND', info=True) }}
+        {{ log('INGESTION HOOKS NOT FOUND', info=True) }}
 
     {% endif %}
 
@@ -73,7 +73,10 @@
     --{{ log(selected_resources, info=True) }}
     {%- set extracted_nodes = [] -%}
     {% for item_selected_node in selected_resources %}
-        {% for item_graph_node in graph.nodes.values() | selectattr("unique_id", "equalto", item_selected_node) %}
+        {% for item_graph_node in graph.nodes.values()
+            | selectattr("resource_type", "equalto", "model")
+            | selectattr("unique_id", "equalto", item_selected_node) %}
+
             {% if item_graph_node.sources %}
                 {% do extracted_nodes.append(item_graph_node) %}
             {% endif %}

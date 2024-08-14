@@ -9,28 +9,12 @@ sources:
         external:
           # For configuring below properties, refer this YAML: models/stages.yml
           load_config:
-            stage: <stage_name>
-            location_path: <relative_path>
-            files: ['<file_name_1>', '<file_name_2>', ...]
-            pattern: <regex_pattern>
-            file_format: <file_format_name>
-            columns:
-              source_columns: all | ['<source_column_1>', '<source_column_2>', ...]
-              target_columns: all | ['<target_column_1>', '<target_column_2>', ...]
+            stage: DM_DB.DATA_OBSERVABILITY.DATA_OBSERVABILITY_STAGE
+            location_path: MATILLION_METADATA/CSV/Schedule API Endpoints.csv
+            file_format: DM_DB.DATA_OBSERVABILITY.DATA_OBS_CSV_FORMAT
             copy_options:
-              on_error: CONTINUE | SKIP_FILE | SKIP_FILE_<num> | 'SKIP_FILE_<number>%' | ABORT_STATEMENT
-              size_limit: <number>
-              purge: true | false
-              return_failed_only: true | false
-              match_by_column_name: CASE_SENSITIVE | CASE_INSENSITIVE | NONE
-              include_metadata:
-                metadata_columns: ['<metadata_column_1>', '<metadata_column_2>', ...]
-                target_columns: ['<target_column_1>', '<target_column_2>', ...]
-              enforce_length: true | false
-              truncatecolumns: true | false
-              force: true | false
-              load_uncertain_files: true | false
-            validation_mode: RETURN_<number>_ROWS | RETURN_ERRORS | RETURN_ALL_ERRORS          
+              on_error: CONTINUE
+              match_by_column_name: CASE_INSENSITIVE        
         columns:
           - name: NAME
             tests:
