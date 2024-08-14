@@ -50,8 +50,9 @@
 {% macro extract_source_nodes(model) %}
     
     {%- set selected_source_nodes = [] -%}
-    {{ log(graph.nodes.values() | list, info=True) }}
+    
     {% if execute -%}
+        {{ log('Graph --> ' ~ graph.nodes.values() | list, info=True) }}
         {%- set model_node = graph.nodes.get(model.unique_id) -%}
     {% else %}
         {%- set model_node = model -%}
