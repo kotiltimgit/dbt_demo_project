@@ -50,7 +50,12 @@
 {% macro extract_source_nodes(model) %}
     
     {%- set selected_source_nodes = [] -%}
-    {%- set model_node = graph.nodes.get(model.unique_id) if execute else model -%}
+    {% if execute -%}
+        {%- set model_node = graph.nodes.get(model.unique_id) -%}
+    {% else %}
+        {%- set model_node = model -%}
+    {% endif -%}
+    {{ log(model_node, info=True) }}
     {%- set model_source_nodes = model_node.sources -%}
     {%- set source_node_prefix = 'source' ~ '.' ~ project_name -%}
 
