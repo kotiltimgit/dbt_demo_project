@@ -1,23 +1,7 @@
 {% macro loading_into_source() %}
-    {{ log(model, info=True) }}
-    {{ log(graph.nodes.values() | list, info=True) }}
-    {%- set selected_source_nodes = [] -%}
-    {%- set model_node = graph.nodes.get(model.unique_id) -%}
-    {%- set model_source_nodes = model_node.sources -%}
-    {{ log(model_source_nodes, info=True) }}
-    {%- set source_node_prefix = 'source' ~ '.' ~ project_name -%}
 
-    {% for item_source_node in model_source_nodes %}
-        {{ log(item_source_node, info=True) }}
-        {%- set source_node_name = item_source_node[0] ~ '.' ~ item_source_node[1] -%}
-        {%- set source_node = source_node_prefix ~ '.' ~ source_node_name -%}
-        {%- set get_source_node = graph.sources.get(source_node) -%}
-        {{ log(get_source_node, info=True) }}
-        {% do selected_source_nodes.append(get_source_node) %}
-    {% endfor %}
-    {{ log(selected_source_nodes, info=True) }}
-    {%- set selected_load_configs = selected_source_nodes -%}
-    {{ log(selected_load_configs, info=True) }}
+    {%- set selected_load_configs = extract_source_nodes(model) -%}
+    
     {% if selected_load_configs %}
         {{ log('PRE_HOOK EXECUTIONS START', info=True) }}
 
@@ -66,7 +50,8 @@
 {% macro extract_source_nodes(model) %}
     
     {%- set selected_source_nodes = [] -%}
-    {%- set model_source_nodes = model.sources -%}
+    {%- set model_node = graph.nodes.get(model.unique_id) if execute else model -%}
+    {%- set model_source_nodes = model_node.sources -%}
     {%- set source_node_prefix = 'source' ~ '.' ~ project_name -%}
 
     {% for item_source_node in model_source_nodes %}
@@ -117,5 +102,5 @@
 {% endmacro %}
 
 {% macro nodes_list() %}
-    {{ return(graph.nodes.get(model.unique_id)) }}
+    {{ return(graph.nodes.get(model.unique_id) if execute) }}
 {% endmacro %}
