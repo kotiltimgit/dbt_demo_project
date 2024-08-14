@@ -52,5 +52,6 @@ tests:
 
 vars:
   dbt_demo_project:
+    model_node: "{{model}}"
     MAT_ALIAS_NAME: null
     DBT_ALIAS_NAME: null

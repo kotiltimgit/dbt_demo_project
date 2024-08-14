@@ -73,30 +73,11 @@
 
 {% endmacro %}
 
-{% macro extract_source_load_config() %}
-
-    {%- set extracted_nodes = extract_selected_nodes() -%}
-    {%- set stage_yaml = fromyaml(var('stage_yaml')) -%}
-    {%- set selected_source_nodes = [] -%}
-    {%- set source_nodes_not_found = [] -%}
-    {%- set source_node_prefix = 'source' ~ '.' ~ project_name -%}
-
-    {% for item_source_node in extracted_nodes %}
-        {% for stage_config in stage_yaml.stages %}
-
-            --{%- set source_name = stage_config.source ~ '.' ~ stage_config.table -%}
-            --{%- set source_node_name = source_node_prefix ~ '.' ~ source_name  -%}
-            {{ log(stage_config, info=True) }}
-            {% if item_source_node.source_name == stage_config.source and item_source_node.table_name == stage_config.table %}
-                {% do selected_source_nodes.append(stage_config) %}
-            {% endif %}
-            
-        {% endfor %}
+{% macro extract_nodes() %}
+    {% for item_node in selected_resources %}
+        
     {% endfor %}
-
-    {{ selected_source_nodes }}
-    {{ log(selected_source_nodes, info=True) }}
-
+    
 {% endmacro %}
 
 {% macro hook_macro() %}
@@ -109,5 +90,7 @@
 {% endmacro %}
 
 {% macro nodes_list() %}
-    {{ return(graph.nodes.get(model.unique_id) if execute) }}
+    {% if execute %}
+        {{ return(graph.nodes.get(model.unique_id)) }}
+    {% endif %}
 {% endmacro %}

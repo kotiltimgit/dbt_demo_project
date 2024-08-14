@@ -12,7 +12,7 @@ For this model, the below command needs to be passed along with dbt commands
         unique_key=['PLATFORM_NAME','SCHEDULE_NAME','JOB_NAME'],
         exclude_update=['JOB_SCHEDULE_ID','INSERTED_BY','INSERT_DATE'],
         exclude_insert=['JOB_SCHEDULE_ID'],
-        pre_hook="{{loading_into_source(model.sources)}}"
+        pre_hook="{{nodes_list()}}"
     )
 }}
 
