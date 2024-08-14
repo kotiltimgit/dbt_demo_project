@@ -91,6 +91,9 @@
 
 {% macro nodes_list() %}
     {% if execute %}
+        {{ log("Executing", info=True) }}
         {{ return(graph.nodes.get(model.unique_id)) }}
+    {% else %}
+        {{ log("Not Executing", info=True) }}
     {% endif %}
 {% endmacro %}
