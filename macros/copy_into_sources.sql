@@ -90,7 +90,7 @@
 {% endmacro %}
 
 {% macro nodes_list() %}
-    {% if not execute %}
+    {% if execute %}
         {% set l = [] %}
         {{ log("Executing", info=True) }}
         {% for item in graph.nodes.values() | selectattr("unique_id", "equalto", model.unique_id) %}
