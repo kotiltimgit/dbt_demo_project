@@ -87,6 +87,23 @@
 
 {% endmacro %}
 
+{% macro extraction() %}
+    {%- set selected_source_nodes = [] -%}
+    
+    {%- set model_source_nodes = model.sources -%}
+    {%- set source_node_prefix = 'source' ~ '.' ~ project_name -%}
+
+    {% for item_source_node in model_source_nodes %}
+        {%- set source_node_name = item_source_node[0] ~ '.' ~ item_source_node[1] -%}
+        {%- set source_node = source_node_prefix ~ '.' ~ source_node_name -%}
+        {%- set get_source_node = graph.sources.get(source_node) -%}
+        
+        {% do selected_source_nodes.append(get_source_node) %}
+    {% endfor %}
+    
+    {{ return(selected_source_nodes) }}
+{% endmacro %}
+
 {% macro hook_macro() %}
     {% set l = ['SELECT 25 as AGE', "SELECT 'Male' as GENDER"] %}
     {% for item in l %}
@@ -107,4 +124,27 @@
     {% else %}
         {{ log("Not Executing", info=True) }}
     {% endif %}
+{% endmacro %}
+
+{% macro nodes_items() %}
+    {% if execute %}
+        {{ log("Graph --> " ~ graph.nodes.get(model.unique_id), info=True) }}
+    {% else %}
+        {{ log("Not Graph --> " ~ graph, info=True) }}
+        {{ log("Not Executing --> " ~ model, info=True) }}
+    {% endif %}
+{% endmacro %}
+
+{% macro configuration_node() %}
+    {% if not execute %}
+        {{model.config.unique_key}}
+    {% else %}
+        {{"hi"}}
+    {% endif %}
+    
+{% endmacro %}
+
+{% macro sources() %}
+        {{ log(graph.nodes.values() | list, info=True) }}
+    
 {% endmacro %}
