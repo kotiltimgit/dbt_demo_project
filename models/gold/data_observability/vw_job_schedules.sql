@@ -2,11 +2,12 @@
 
 {{
     config(
-        materialized='view',
+        materialized='view', 
         database='DBT_DB_DEV',
         schema='GOLD',
         alias='VW_JOB_SCHEDULES'
     )
 }}
 
-select * from {{ ref('job_schedules') }}
+select 
+* from {{ ref('job_schedules') }}
