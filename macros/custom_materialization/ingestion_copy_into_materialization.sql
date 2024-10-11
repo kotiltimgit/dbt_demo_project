@@ -11,7 +11,9 @@
 
     -- external stage
     {%- set stage_name = config.require('external_stage') -%}
-    {%- set stage_file_path = config.get('stage_file_path', default=None) -%}    -- for single file
+    -- For single file: Path must be point out to the file (e.g. - 'path/to/the/file.csv' [OR] 'path/to/the/file.json' [OR] .....)
+    -- For multiple files: Path must be point out to the folder/directory (e.g. - 'path/to/the/directory')
+    {%- set location_path = config.require('location_path') -%}
     {%- set files = config.get('files', default=None) -%}
     {%- set pattern = config.get('pattern', default=None) -%}
     --{%- set external_stage = '@' ~ stage_name ~ '/' ~ stage_file_path -%}
@@ -25,22 +27,23 @@
 
     {% call statement("main") %}
         copy into {{ target_relation }}
-            from '@{{ stage_name }}
-            {%- if stage_file_path -%}/{{ stage_file_path }}{%- endif -%}'
+            from '@{{ stage_name }}/{{ location_path }}'
         {% if files -%}
+        -- FILES
         files = ({{ files | trim('[]') }})
         {%- endif -%}
         {% if pattern -%}
+        -- PATTERN
         pattern = '{{ pattern }}'
         {%- endif -%}
         -- FILE FORMAT
         file_format = (format_name = '{{ file_format_name }}')
-        -- COPY OPTIONS
         {% if copy_options -%}
-            {{ copy_options.items() | map('join', ' = ') | join('\n') }}
+        -- COPY OPTIONS
+        {{ copy_options.items() | map('join', ' = ') | join('\n') }}
         {% endif -%}
-        -- VALIDATION MODE
         {% if validation_mode -%}
+        -- VALIDATION MODE
         validation_mode = '{{ validation_mode }}'
         {%- endif -%}
         ;

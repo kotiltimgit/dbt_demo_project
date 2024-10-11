@@ -1,6 +1,38 @@
 {% macro loading_into_source() %}
 
-    {%- set selected_load_configs = extract_source_nodes() -%}
+    {%- set extracted_model_nodes = [] -%}
+    --{{ log('Selected_resources' ~ selected_resources, info=True) }}
+    {% for item_selected_node in selected_resources %}
+        {%- set model_node = graph.nodes.get(item_selected_node) -%}
+        --{{ log('model_node' ~ model_node, info=True) }}
+        {% if model_node.sources %}
+            {% do extracted_model_nodes.append(model_node) %}
+        {% endif %}
+    {% endfor %}
+
+    {%- set selected_source_nodes = [] -%}
+    {{ log('extracted_model_nodes' ~ extracted_model_nodes, info=True) }}
+    
+    {% if extracted_model_nodes %}
+        {% for item_model_node in extracted_model_nodes %}
+            {%- set model_source_nodes = item_model_node.sources -%}
+            {%- set source_node_prefix = 'source' ~ '.' ~ project_name -%}
+
+            {% for item_source_node in model_source_nodes %}
+                {%- set source_node_name = item_source_node[0] ~ '.' ~ item_source_node[1] -%}
+                {%- set source_node = source_node_prefix ~ '.' ~ source_node_name -%}
+                {%- set get_source_node = graph.sources.get(source_node) -%}
+                
+                {% do selected_source_nodes.append(get_source_node) %}
+            {% endfor %}
+        {% endfor %}
+    {% endif %}
+
+
+    {%- set extracted_nodes_list = extract_nodes() -%}
+    {{ log('extracted_nodes_list' ~ extracted_nodes_list, info=True) }}
+    {%- set selected_load_configs = extract_source_nodes(extracted_nodes_list) -%}
+    {{ log('selected_load_configs' ~ selected_load_configs, info=True) }}
     
     {% if selected_load_configs %}
         {{ log('INGESTION EXECUTIONS START', info=True) }}
@@ -8,29 +40,45 @@
         {% for item_load_config in selected_load_configs %}
             {%- set target_relation = item_load_config.relation_name -%}
             {%- set load_config = item_load_config.external.load_config -%}
+            {% if load_config.columns -%}
+                {%- set src_columns = load_config.columns.get('source_columns') -%}
+                {%- set tgt_columns = load_config.columns.get('target_columns') -%}
+            {% endif -%}
 
             {% call statement() %}
-                copy into {{ target_relation }}
+                copy into {{ target_relation }} {%- if load_config.columns -%}
+                ({{ tgt_columns | join(', ') }}) 
+                    from (
+                            select
+                                {{ src_columns | join(', ') }}
+                            from '@{{ load_config.stage }}
+                            {%- if load_config.location_path -%}
+                            /{{ load_config.location_path }}
+                            {%- endif -%}'
+                        )
+                    
+                {%- else -%}
                     from '@{{ load_config.stage }}
-                {%- if load_config.location_path -%}
-                /{{ load_config.location_path }}
-                {%- endif -%}'
+                    {%- if load_config.location_path -%}
+                    /{{ load_config.location_path }}
+                    {%- endif -%}'
+                {%- endif -%}
+                {% if load_config.files -%}.
                 -- FILES
-                {% if load_config.files -%}
                 files = ({{ load_config.files | trim('[]') }})
                 {% endif -%}
-                -- PATTERN
                 {% if load_config.pattern -%}
+                -- PATTERN
                 pattern = '{{ load_config.pattern }}'
                 {% endif -%}
                 -- FILE FORMAT
                 file_format = (format_name = '{{load_config.file_format}}')
-                -- COPY OPTIONS
                 {% if load_config.copy_options -%}
-                {{ load_config.copy_options.items() | map('join', ' = ') | join(', ') }}
+                -- COPY OPTIONS
+                {{ load_config.copy_options.items() | map('join', ' = ') | join('\n') }}
                 {% endif -%}
-                -- VALIDATION MODE
                 {% if load_config.validation_mode -%}
+                -- VALIDATION MODE
                 validation_mode = {{ load_config.validation_mode }}
                 {% endif -%}
                 ;
@@ -47,104 +95,48 @@
 
 {% endmacro %}
 
-{% macro extract_source_nodes() %}
+{% macro extract_source_nodes(extracted_model_nodes) %}
     
     {%- set selected_source_nodes = [] -%}
-    {%- set extracted_model_nodes = extract_nodes() -%}
+    {{ log('extracted_model_nodes' ~ extracted_model_nodes, info=True) }}
     
-    {% for item_model_node in extracted_model_nodes %}
-        {%- set model_source_nodes = item_model_node.sources -%}
-        {%- set source_node_prefix = 'source' ~ '.' ~ project_name -%}
+    {% if extracted_model_nodes %}
+        {% for item_model_node in extracted_model_nodes %}
+            {%- set model_source_nodes = item_model_node.sources -%}
+            {%- set source_node_prefix = 'source' ~ '.' ~ project_name -%}
 
-        {% for item_source_node in model_source_nodes %}
-            {%- set source_node_name = item_source_node[0] ~ '.' ~ item_source_node[1] -%}
-            {%- set source_node = source_node_prefix ~ '.' ~ source_node_name -%}
-            {%- set get_source_node = graph.sources.get(source_node) -%}
-            
-            {% do selected_source_nodes.append(get_source_node) %}
+            {% for item_source_node in model_source_nodes %}
+                {%- set source_node_name = item_source_node[0] ~ '.' ~ item_source_node[1] -%}
+                {%- set source_node = source_node_prefix ~ '.' ~ source_node_name -%}
+                {%- set get_source_node = graph.sources.get(source_node) -%}
+                
+                {% do selected_source_nodes.append(get_source_node) %}
+            {% endfor %}
         {% endfor %}
-    {% endfor %}
-    
+    {% endif %}
+    --{{ log('selected_source_nodes' ~ selected_source_nodes, info=True) }}
     {{ return(selected_source_nodes) }}
 
 {% endmacro %}
 
 {% macro extract_nodes() %}
-    --{{ log(selected_resources, info=True) }}
-    {%- set extracted_nodes = [] -%}
-    {% for item_selected_node in selected_resources %}
-        {% for item_graph_node in graph.nodes.values()
-            | selectattr("resource_type", "equalto", "model")
-            | selectattr("unique_id", "equalto", item_selected_node) %}
 
-            {% if item_graph_node.sources %}
-                {% do extracted_nodes.append(item_graph_node) %}
+    {% if execute %}
+        {%- set extracted_nodes = [] -%}
+        --{{ log('Selected_resources' ~ selected_resources, info=True) }}
+        {% for item_selected_node in selected_resources %}
+            {%- set model_node = graph.nodes.get(item_selected_node) -%}
+            --{{ log('model_node' ~ model_node, info=True) }}
+            {% if model_node.sources %}
+                {% do extracted_nodes.append(model_node) %}
             {% endif %}
         {% endfor %}
-    {% endfor %}
-    
-    {{ return(extracted_nodes) }}
 
-{% endmacro %}
-
-{% macro extraction() %}
-    {%- set selected_source_nodes = [] -%}
-    
-    {%- set model_source_nodes = model.sources -%}
-    {%- set source_node_prefix = 'source' ~ '.' ~ project_name -%}
-
-    {% for item_source_node in model_source_nodes %}
-        {%- set source_node_name = item_source_node[0] ~ '.' ~ item_source_node[1] -%}
-        {%- set source_node = source_node_prefix ~ '.' ~ source_node_name -%}
-        {%- set get_source_node = graph.sources.get(source_node) -%}
-        
-        {% do selected_source_nodes.append(get_source_node) %}
-    {% endfor %}
-    
-    {{ return(selected_source_nodes) }}
-{% endmacro %}
-
-{% macro hook_macro() %}
-    {% set l = ['SELECT 25 as AGE', "SELECT 'Male' as GENDER"] %}
-    {% for item in l %}
-        {% call statement(auto_begin=True) %}
-            {{item}}
-        {% endcall %}
-    {% endfor %}
-{% endmacro %}
-
-{% macro nodes_list() %}
-    {% if execute %}
-        {% set l = [] %}
-        {{ log("Executing", info=True) }}
-        {% for item in graph.nodes.values() | selectattr("unique_id", "equalto", model.unique_id) %}
-            {% do l.append(item) %}
-        {% endfor %}
-        {{ return(l) }}
-    {% else %}
-        {{ log("Not Executing", info=True) }}
+        {{ return(extracted_nodes) }}
     {% endif %}
+
 {% endmacro %}
 
-{% macro nodes_items() %}
-    {% if execute %}
-        {{ log("Graph --> " ~ graph.nodes.get(model.unique_id), info=True) }}
-    {% else %}
-        {{ log("Not Graph --> " ~ graph, info=True) }}
-        {{ log("Not Executing --> " ~ model, info=True) }}
-    {% endif %}
-{% endmacro %}
-
-{% macro configuration_node() %}
-    {% if not execute %}
-        {{model.config.unique_key}}
-    {% else %}
-        {{"hi"}}
-    {% endif %}
-    
-{% endmacro %}
-
-{% macro sources() %}
-        {{ log(graph.nodes.values() | list, info=True) }}
-    
+{% macro get_SQL() %}
+    {{ return(this.sql) }}
 {% endmacro %}

@@ -126,8 +126,8 @@ stages:
 
     # transformation properties
     columns:    # columns mapping for transforming data during loading
-      source_columns: all | ['<source_column_1>', '<source_column_2>', ...]
-      target_columns: all | ['<target_column_1>', '<target_column_2>', ...]
+      source_columns: ['<source_column_1>', '<source_column_2>', ...]
+      target_columns: ['<target_column_1>', '<target_column_2>', ...]
     
     # For configuring below properties
     # Kindly refer this documentation: https://docs.snowflake.com/en/sql-reference/sql/copy-into-table

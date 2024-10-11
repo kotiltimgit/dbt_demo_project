@@ -6,7 +6,7 @@ For this model, the below command needs to be passed along with dbt commands
 {{
     config(
         materialized='custom_merge_material',
-        alias=var('MAT_ALIAS_NAME', default='JOB_SCHEDULES'),
+        alias=var('MAT_ALIAS_NAME'),
         database='DBT_DB_DEV',
         schema='SILVER',
         unique_key=['PLATFORM_NAME','SCHEDULE_NAME','JOB_NAME'],

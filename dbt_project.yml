@@ -24,10 +24,10 @@ clean-targets: # directories to be removed by `dbt clean`
   - "dbt_packages"
 
 on-run-start: 
-  - "{% if execute %} {{ loading_into_source() }} {% endif %}"
+  - "{% if execute %}{{ loading_into_source() }}{% endif %}"
 
-on-run-end:
-  - "{{ dbt_artifacts.upload_results(results) }}"
+#on-run-end:
+  #- "{{ dbt_artifacts.upload_results(results) }}"
   
 # Configuring models
 # Full documentation: https://docs.getdbt.com/docs/configuring-models
