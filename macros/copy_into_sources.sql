@@ -9,9 +9,9 @@
             {% do extracted_model_nodes.append(model_node) %}
         {% endif %}
     {% endfor %}
+    {{ log('extracted_model_nodes' ~ extracted_model_nodes, info=True) }}
 
     {%- set selected_source_nodes = [] -%}
-    {{ log('extracted_model_nodes' ~ extracted_model_nodes, info=True) }}
     
     {% if extracted_model_nodes %}
         {% for item_model_node in extracted_model_nodes %}
@@ -27,14 +27,12 @@
             {% endfor %}
         {% endfor %}
     {% endif %}
+    {{ log('selected_source_nodes' ~ selected_source_nodes, info=True) }}
 
-
-    {%- set extracted_nodes_list = extract_nodes() -%}
-    {{ log('extracted_nodes_list' ~ extracted_nodes_list, info=True) }}
-    {%- set selected_load_configs = extract_source_nodes(extracted_nodes_list) -%}
+    {%- set selected_load_configs = selected_source_nodes -%}
     {{ log('selected_load_configs' ~ selected_load_configs, info=True) }}
     
-    {% if selected_load_configs %}
+    {% if selected_load_configs and execute%}
         {{ log('INGESTION EXECUTIONS START', info=True) }}
 
         {% for item_load_config in selected_load_configs %}

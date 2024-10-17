@@ -23,10 +23,8 @@ clean-targets: # directories to be removed by `dbt clean`
   - "target"
   - "dbt_packages"
 
-on-run-start: 
-  - "{% if execute %}{{ loading_into_source() }}{% endif %}"
-
 on-run-end:
+  - "{{ test_executions_result(database=target.database, schema=target.schema, table_identifier='TEST_EXECUTIONS_RESULT') }}"
   - "{{ dbt_artifacts.upload_results(results) }}"
   
 # Configuring models
@@ -55,6 +53,5 @@ tests:
 
 vars:
   dbt_demo_project:
-    model_node: "{{model}}"
     MAT_ALIAS_NAME: null
     DBT_ALIAS_NAME: null
