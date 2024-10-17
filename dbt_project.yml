@@ -2,7 +2,7 @@
 # and underscores. A good package name should reflect your organization's
 # name or the intended use of these models
 name: "dbt_demo_project"
-version: "1.0.0"
+version: "1.8.0"
 config-version: 2
 
 # This setting configures which "profile" dbt uses for this project.
@@ -24,6 +24,7 @@ clean-targets: # directories to be removed by `dbt clean`
   - "dbt_packages"
 
 on-run-end:
+  - "{{ test_executions_result(database=target.database, schema=target.schema, table_identifier='TEST_EXECUTIONS_RESULT') }}"
   - "{{ dbt_artifacts.upload_results(results) }}"
   
 # Configuring models
@@ -55,3 +56,8 @@ tests:
     +store_failures: true  # all tests
     +severity: warn  # all tests
     +database: DBT_DB_DEV
+
+vars:
+  dbt_demo_project:
+    MAT_ALIAS_NAME: null
+    DBT_ALIAS_NAME: null

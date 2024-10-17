@@ -1,3 +1,8 @@
+/*
+For this model, the below command needs to be passed along with dbt commands
+[   --vars '{MAT_ALIAS_NAME: JOB_SCHEDULES}'   ]
+*/
+
 {{
     config(
         materialized='custom_merge_material',

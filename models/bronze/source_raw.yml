@@ -6,6 +6,18 @@ sources:
     schema: BRONZE
     tables:
       - name: MATILLION_SCHEDULES
+        external:
+          # For configuring below properties, refer this YAML: models/stages.yml
+          load_config:
+            stage: DM_DB.DATA_OBSERVABILITY.DATA_OBSERVABILITY_STAGE
+            location_path: MATILLION_METADATA/CSV/Schedule API Endpoints.csv
+            file_format: DM_DB.DATA_OBSERVABILITY.DATA_OBS_CSV_FORMAT
+            columns:
+              source_columns:
+              target_columns:
+            copy_options:
+              on_error: CONTINUE
+              match_by_column_name: CASE_INSENSITIVE        
         columns:
           - name: NAME
             tests:
