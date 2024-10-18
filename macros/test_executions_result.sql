@@ -3,36 +3,39 @@
     {%- set relation_exists = adapter.get_relation(database=database, schema=schema, identifier=table_identifier) -%}
     {%- set relation = database ~ '.' ~ schema ~ '.' ~ table_identifier -%}
     
-    {% if not relation_exists %}
-        {{ log("Target Table Not Exist, So Executing 'CREATE TABLE SQL'", info=True) }}
-        {% call statement('test_executions_create_table') %}
-            create table {{ relation }} (
-                TEST_EXECUTION_ID VARCHAR(2000) NOT NULL DEFAULT UUID_STRING(),
-                COMMAND_INVOCATION_ID VARCHAR(2000),
-                NODE_ID VARCHAR(2000),
-                RUN_STARTED_AT TIMESTAMP_NTZ,
-                THREAD_ID VARCHAR(2000),
-                STATUS VARCHAR,
-                COMPILED_CODE VARCHAR,
-                COMPILE_STARTED_AT TIMESTAMP_NTZ,
-                QUERY_COMPLETED_AT TIMESTAMP_NTZ,
-                TOTAL_NODE_RUNTIME FLOAT,
-                FAILURES INT,
-                FAILURE_RECORDS VARIANT,
-                MESSAGE VARCHAR
-            )
-            ;
-        {% endcall %}
-        {{ log("Target Table '" ~ relation ~ "' Created Successfully", info=True) }}
-    
-    {% else %}
-        {{ log("Target Table '" ~ relation ~ "' Exist", info=True) }}
-    {% endif %}
-    
     {% if test_executions_object != [] %}
         {{ log("There are '" ~ test_executions_object | length ~ "' Test Executions Identified in this Invocation", info=True) }}
+
+        {% if not relation_exists %}
+            {{ log("Target Table Not Exist", info=True) }}
+            {{ log("Executing 'CREATE TABLE SQL'", info=True) }}
+            {% call statement('test_executions_create_table') %}
+                create table {{ relation }} (
+                    TEST_EXECUTION_ID VARCHAR(2000) NOT NULL DEFAULT UUID_STRING(),
+                    COMMAND_INVOCATION_ID VARCHAR(2000),
+                    NODE_ID VARCHAR(2000),
+                    RUN_STARTED_AT TIMESTAMP_NTZ,
+                    THREAD_ID VARCHAR(2000),
+                    STATUS VARCHAR,
+                    COMPILED_CODE VARCHAR,
+                    COMPILE_STARTED_AT TIMESTAMP_NTZ,
+                    QUERY_COMPLETED_AT TIMESTAMP_NTZ,
+                    TOTAL_NODE_RUNTIME FLOAT,
+                    FAILURES INT,
+                    FAILURE_RECORDS VARIANT,
+                    MESSAGE VARCHAR
+                )
+                ;
+            {% endcall %}
+            {{ log("Target Table '" ~ relation ~ "' Created Successfully", info=True) }}
+        
+        {% else %}
+            {{ log("Target Table '" ~ relation ~ "' is Already Exist", info=True) }}
+        {% endif %}
+
         {%- set columns_content_sql = get_columns_content_sql(test_executions_object) -%}
 
+        {{ log("Executing 'INSERT INTO SQL", info=True) }}
         {% call statement('insert_into_test_executions_table') %}
             insert into {{ relation }} (
                 COMMAND_INVOCATION_ID,
@@ -51,7 +54,6 @@
             {{ columns_content_sql }}
             ;
         {% endcall %}
-        --{{ log(insert_into_test_executions_sql, info=True) }}
         {{ log("All Test Executions Result Loaded in Table Successfully", info=True) }}
 
     {% else %}
@@ -84,7 +86,8 @@
 
             '{{ test_object.thread_id }}', {# 4. thread_id #}
             '{{ test_object.status }}', {# 5. status #}
-            '{{ test_object.node.compiled_code}}', {# 6. compiled_query #}
+            {% set compiled_code = test_object.node.compiled_code | replace("'", "''") %}
+            '{{ compiled_code}}', {# 6. compiled_code #}
 
             {% set compile_started_at = (test_object.timing | selectattr("name", "eq", "compile") | first | default({}))["started_at"] %}
             {% if compile_started_at %}'{{ compile_started_at }}'{% else %}null{% endif %}, {# 7. compile_started_at #}
