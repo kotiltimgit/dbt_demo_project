@@ -18,6 +18,8 @@
   -- extracting the target table columns and storing in list
   {%- set  update_result = run_custom_query(
     "select COLUMN_NAME from " ~ database ~ ".INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='" ~ schema ~ "' AND TABLE_NAME='" ~ table_name ~ "' AND COLUMN_NAME NOT IN " ~ update_exclude_columns_list ~ " ORDER BY ORDINAL_POSITION;") -%}
+  {%- set update_columns = update_result['data'] | map(attribute=0) | list -%}
+  {{ log(update_columns, info=True) }}
   {%- set  insert_result = run_custom_query(
     "select COLUMN_NAME from " ~ database ~ ".INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='" ~ schema ~ "' AND TABLE_NAME='" ~ table_name ~ "' AND COLUMN_NAME NOT IN " ~ insert_exclude_columns_list ~ " ORDER BY ORDINAL_POSITION;") -%}
   {%- set insert_columns_list = insert_result['data'] | map(attribute=0) | list -%}

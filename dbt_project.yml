@@ -24,7 +24,7 @@ clean-targets: # directories to be removed by `dbt clean`
   - "dbt_packages"
 
 on-run-end:
-  - "{{ test_executions_result(database=target.database, schema=target.schema, table_identifier='TEST_EXECUTIONS_RESULT') }}"
+  - "{{ test_executions_result(schema='DBT_CUSTOM_LOGGING') }}"
   - "{{ dbt_artifacts.upload_results(results) }}"
   
 # Configuring models
