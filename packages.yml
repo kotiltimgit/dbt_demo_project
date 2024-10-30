@@ -1,3 +1,5 @@
 packages:
   - package: brooklyn-data/dbt_artifacts
     version: 2.6.3
+  - package: elementary-data/elementary
+    version: 0.15.2

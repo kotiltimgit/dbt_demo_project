@@ -1,1 +1,1 @@
-{{graph.sources.values() | list | join('\n')}}
+{{target.schema}}
