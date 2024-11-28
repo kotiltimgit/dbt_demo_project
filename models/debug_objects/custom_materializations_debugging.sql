@@ -1,1 +1,0 @@
-{{graph.sources.values() | list | join('\n')}}
