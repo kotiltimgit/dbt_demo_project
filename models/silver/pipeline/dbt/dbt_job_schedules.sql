@@ -4,7 +4,7 @@
         alias=var('DBT_ALIAS_NAME'),
         database='DBT_DB_DEV',
         schema='SILVER',
-        unique_key=['PLATFORM_NAME','SCHEDULE_NAME','JOB_NAME'],
+        unique_key=['PLATFORM_NAME','JOB_NAME'],
         exclude_update=['JOB_SCHEDULE_ID','INSERTED_BY','INSERT_DATE'],
         exclude_insert=['JOB_SCHEDULE_ID']
     )
