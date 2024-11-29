@@ -24,7 +24,7 @@ Properties needs to be defined in config() block
         alias='MATILLION_SCHEDULES',
         database='DBT_DB_DEV',
         schema='BRONZE',
-        external_stage='DBT_DB_DEV.BRONZE.AWS_STAGE',
+        external_stage='DBT_DB_DEV.BRONZE.DICOE_AWS_STAGE',
         location_path='MATILLION_METADATA/CSV/Schedule API Endpoints.csv',
         file_format='DBT_DB_DEV.BRONZE.CSV_FORMAT',
         copy_options={'on_error': 'CONTINUE', 'match_by_column_name': 'CASE_INSENSITIVE'}
