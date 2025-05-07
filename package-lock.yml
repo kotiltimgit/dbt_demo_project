@@ -1,8 +1,11 @@
 packages:
-  - package: brooklyn-data/dbt_artifacts
-    version: 2.6.3
-  - package: elementary-data/elementary
+  - name: dbt_artifacts
+    package: brooklyn-data/dbt_artifacts
+    version: 2.9.2
+  - name: elementary
+    package: elementary-data/elementary
     version: 0.15.2
-  - package: dbt-labs/dbt_utils
-    version: 1.2.0
-sha1_hash: 36b50f2667fa6fd6c9f26c96c7ca9a66d8d01a91
+  - name: dbt_utils
+    package: dbt-labs/dbt_utils
+    version: 1.3.0
+sha1_hash: 45eef5c13fadb398706263b47e941178b7cc387b
