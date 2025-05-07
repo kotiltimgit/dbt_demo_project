@@ -25,6 +25,11 @@
     -- validation_mode
     {%- set validation_mode = config.get('validation_mode', default=None) -%}
 
+    {%- set relation_without_identifier = database ~ '.' ~ schema -%}
+    {%- call statement('create_schema_copy_into') -%}
+        create schema if not exists {{ relation_without_identifier }}
+    {% endcall %}
+
     {% call statement("main") %}
         copy into {{ target_relation }}
             from '@{{ stage_name }}/{{ location_path }}'

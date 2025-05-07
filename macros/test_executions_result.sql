@@ -4,6 +4,13 @@
     {%- set relation = database ~ '.' ~ schema ~ '.' ~ table_identifier -%}
     
     {% if test_executions_object != [] %}
+        {{ log("Executing 'CREATE SCHEMA SQL'", info=True) }}
+
+        {%- set relation_without_identifier = database ~ '.' ~ schema -%}
+        {%- call statement('create_schema_test_results') -%}
+            create schema if not exists {{ relation_without_identifier }}
+        {% endcall %}
+
         {{ log("There are '" ~ test_executions_object | length ~ "' Test Executions Identified in this Invocation", info=True) }}
 
         {% if not relation_exists %}
@@ -35,7 +42,7 @@
 
         {%- set columns_content_sql = get_columns_content_sql(test_executions_object) -%}
 
-        {{ log("Executing 'INSERT INTO SQL", info=True) }}
+        {{ log("Executing 'INSERT INTO SQL'", info=True) }}
         {% call statement('insert_into_test_executions_table') %}
             insert into {{ relation }} (
                 COMMAND_INVOCATION_ID,

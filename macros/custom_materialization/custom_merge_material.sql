@@ -1,7 +1,7 @@
 {% materialization custom_merge_material, adapter='default' -%}
  
   -- Log message
-  {{ log('USING CUSTOM MATERIALIZATION', info=True) }}
+  {{ log('USING CUSTOM MERGE MATERIALIZATION', info=True) }}
  
   -- config
   {%- set database = config.require('database') -%}
@@ -40,7 +40,7 @@
     {% endset %}
     {% do join_condition.append(unique_key_match) %}
   {% endif %}
- 
+
   {%- set source = sql -%}
  
   {% call statement("main") %}
