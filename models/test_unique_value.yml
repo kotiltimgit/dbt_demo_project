@@ -1,0 +1,8 @@
+version: 2
+
+models:
+  - name: test_unique_value
+    columns:
+      - name: reg_no
+        tests:
+          - unique
