@@ -57,7 +57,12 @@ tests:
     +severity: warn  # all tests
     +database: DBT_DB_DEV
 
+seeds:
+  database: DBT_DB_DEV
+  schema: BRONZE
+  
 vars:
   dbt_demo_project:
     MAT_ALIAS_NAME: null
     DBT_ALIAS_NAME: null
+
