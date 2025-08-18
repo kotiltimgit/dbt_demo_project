@@ -56,8 +56,3 @@ tests:
     +store_failures: true  # all tests
     +severity: warn  # all tests
     +database: DBT_DB_DEV
-
-vars:
-  dbt_demo_project:
-    MAT_ALIAS_NAME: null
-    DBT_ALIAS_NAME: null

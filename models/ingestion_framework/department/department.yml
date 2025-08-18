@@ -1,0 +1,99 @@
+version: 2
+ 
+models:
+  # Model name must match the filename of a model -- including case sensitivity
+  - name: department
+    meta:
+      integration:                                     # -----------Configuration of Integration/Source system --------------
+        integration_name: HR                           # Name of integration or source system 
+        integration_reporting_name: HR Data Management # Dispay Name of the source system in reporting or front end applications
+        integration_type: File                              # Type of source system file , database or rest api based
+        integration_owner: Koteswar                         # Owner of the source system
+        inbound: true # true|false                          # specify True if the source system is Loading data to target data platform
+        active: true  # true|false                          # specify True if the source system is active
+      job:                                             # -----------Configuration of Job details ----------------------------
+        ingestion_tool_name: dbt cloud                      # Integration tool name used for loading the table
+        job_name: job_dbt_finance_src_load                  # Integration Job name used for loading the table
+        cron_schedule: "* * * 5 *"                          # Schedule of the job configured in integration tool
+        humanized_schedule: "Daily once at 5AM"             # Schedule of the job configured in integration tool
+      source_location_conf:                             # ----------Configuration of Source object details and target table details -------
+        file_type: csv                                      # Type of file (csv|json|xml|parquet)
+        filename: Department.csv                          # Name of the file 
+        files: []                                           # List of file names
+        pattern:                                            # Pattern of the file
+        stage_name: DBT_DB_DEV.SILVER.AWS_STAGE_DICOE                       # External stage name configured in the target data platform
+        stage_landing_path: DBT_METADATA/INGESTION_FRAMEWORK            # Landing path where the files are available for loading in external stage
+        stage_archive_path: path/to/the/location            # Archival path where the files need to be moved after successful loading
+        stage_error_path: path/to/the/location              # Error path where the files need to be moved if file loading failed
+        file_format: DBT_DB_DEV.SILVER.CSV_FILE_FORMAT                        # File format name configured in the target data platform
+        partitioned:                                        # Specify True|False if partition need to be considered while loading
+        partition_key:                                      # Specify the partition key
+        copy_options: 'PURGE = False
+ 
+          FORCE = False
+ 
+          SIZE_LIMIT = 3'                                    # Copy Options need to be considered whil loading
+        validation_mode:                                    # Specify the validation mode 
+      stage_table: 
+        enabled: false                                        # Specify True if stage table is applicable
+        database: DBT_DB_DEV                                # Specify the database name of stage table
+        schema: BRONZE                                      # Specify the schema name of stage table
+        stage_table_name: STG_DEPARTMENT                            # Specify the name of the stage table      
+    config:
+      materialized: dummy_materialization           # Always specify 'dummy materialization' to overwrite the dbt's default behaviour of 'view materialization'
+      primary_keys: ['DEPARTMENT_ID']               # Specify the primary key to be used while creating DDL for Raw table
+      database: DBT_DB_DEV                                  # Specify the  database name of raw table
+      schema: BRONZE                                        # Specify the schema name of raw table
+      raw_table_name: DEPARTMENT                                       # Specify the name of raw table
+    columns:
+      - name: DEPARTMENT_ID # required               # Specify the column of your target table
+        meta:
+          contains_pii: false                       # Specify if PII information 
+          source_column: Dept_Id                # Specify source column mapped to the corresponding target column
+          source_column_position: $1                # Specify the poistion of source column in file
+          sql_column_datatype: INT                  # Specify the SQL data type to be considered while creating the target table
+          copy_transformation_logic:                # Specify the copy transformation logic supported by the COPY INTO
+          transformation_logic:                     # Specify the transformation logic to be applied while loading from STG TO RAW table
+        tests:
+          - unique
+      - name: DEPARTMENT_NAME # required               # Specify the column of your target table
+        meta:
+          contains_pii: false                       # Specify if PII information 
+          source_column: Department_Name                # Specify source column mapped to the corresponding target column
+          source_column_position: $2               # Specify the poistion of source column in file
+          sql_column_datatype: VARCHAR(200)                  # Specify the SQL data type to be considered while creating the target table
+          copy_transformation_logic:                # Specify the copy transformation logic supported by the COPY INTO
+          transformation_logic:                     # Specify the transformation logic to be applied while loading from STG TO RAW table
+        tests:
+          - unique
+      - name: DEPARTMENT_HEAD               # Specify the column of your target table
+        meta:
+          contains_pii: false                       # Specify if PII information 
+          source_column: Department_Head                # Specify source column mapped to the corresponding target column
+          source_column_position: $3               # Specify the poistion of source column in file
+          sql_column_datatype: VARCHAR(200)                 # Specify the SQL data type to be considered while creating the target table
+          copy_transformation_logic:                # Specify the copy transformation logic supported by the COPY INTO
+          transformation_logic:                     # Specify the transformation logic to be applied while loading from STG TO RAW table
+        tests:
+          - unique
+      - name: FILE_NAME                # Specify the column of your target table
+        meta:
+          raw_table: false            
+          contains_pii: false                      # Specify if PII information 
+          source_column:                  # Specify source column mapped to the corresponding target column
+          source_column_position:              # Specify the poistion of source column in file
+          sql_column_datatype: VARCHAR(500)                 # Specify the SQL data type to be considered while creating the target table
+          copy_transformation_logic: metadata$filename   # Specify the copy transformation logic supported by the COPY INTO
+          transformation_logic:                  # Specify the transformation logic to be applied while loading from STG TO RAW table
+        tests:
+          - unique
+      - name: ETL_LOADED_TIME                # Specify the column of your target table
+        meta:
+          contains_pii: false                       # Specify if PII information 
+          source_column:                  # Specify source column mapped to the corresponding target column
+          source_column_position:              # Specify the poistion of source column in file
+          sql_column_datatype: TIMESTAMP_NTZ(9)             # Specify the SQL data type to be considered while creating the target table
+          copy_transformation_logic: current_timestamp()   # Specify the copy transformation logic supported by the COPY INTO
+          transformation_logic:  current_timestamp()       # Specify the transformation logic to be applied while loading from STG TO RAW table
+        tests:
+          - unique         

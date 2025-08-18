@@ -1,0 +1,1 @@
+{{ ingestion_csv_macro(model) }}

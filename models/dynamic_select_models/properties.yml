@@ -1,0 +1,36 @@
+version: 2
+
+models:
+  - name: dynamic_select_model_1
+    config:
+      transformation:
+        source_columns:
+          - name: <col_name_1>
+            alias: <alias_name>
+            transform_logic:
+              group_by: true | false
+              order_by: true | false
+              join_logic: true | false
+          - name: <col_name_2>
+            alias: <alias_name>
+            transform_logic:
+              group_by: true | false
+              order_by: true | false
+              join_logic: true | false
+        target_columns:
+          - name: <col_name_1>
+            alias: <alias_name>
+            transform_logic:
+              group_by: true | false
+              order_by: true | false
+              join_logic: true | false
+          - name: <col_name_2>
+            alias: <alias_name>
+            transform_logic:
+              group_by: true | false
+              order_by: true | false
+              join_logic: true | false
+        join_condition: <join_name>
+        group_by: enable | disable
+        order_by: enable | disable
+        

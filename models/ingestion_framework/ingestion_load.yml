@@ -1,0 +1,56 @@
+version: 2
+
+# Sugession: naming convention to include 'Frm_' as prefix for every properties in meta
+sources:
+  - name: FINANCE # required
+    description: No Description
+    database: DEV_SRC # dynamic alignment based on env (suggestion: env_var()). Parellely look into dbt core for env_var support.
+    schema: SRC_FINANCE # dynamic alignment based on env (suggestion: env_var()). Parellely look into dbt core for env_var support.
+    meta: # used for ingestion framework
+      Integration:
+        Integration_Name: Finance
+        Integration_Type: File
+        Integration_Owner: Koteswar
+      Job:
+        Frm_Orchestration_tool: dbt cloud
+        Job_Name: job_dbt_finance_src_load
+        Cron Schedule: "* * * 5 *"
+    
+    # requires v1.1+
+    config: # dbt default
+      source_configs: values
+
+    tables:
+      - name: finance #required
+        meta:
+          Job:
+            Frm_Orchestration_tool: dbt cloud
+            Job_Name: job_dbt_finance_table_load
+            Cron Schedule: "* * * 5 *"
+          Source_Location:
+            File Type: csv
+            Filename: Finance_2024.csv
+            Pattern:
+            Snowflake_Stage_Name: AWS_STAGE_FINANCE
+            Stage_Landing_Path: path/to/the/location
+            Stage_Archive_Path: path/to/the/location
+            Stage_Error_Path: path/to/the/location
+            File_Fromat: CSV_FILE_FORMAT
+            Partitioned:
+            Partition_Key:
+            Default_Audit_Columns: []
+        config: # dbt default
+          source_table_config: values
+
+        external: {}
+        columns:
+          - name: email # required
+            meta:
+              contains_pii: true
+              source_column: $1
+              source_column_datatype: STRING
+          - name: phone_number # required
+            meta:
+              contains_pii: true
+              source_column: $2
+              source_column_datatype: NUMBER

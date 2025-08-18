@@ -1,1 +1,13 @@
-{{target.schema}}
+
+ 
+{% set source_entry =  {
+    "source_name": "MATILLION",
+    "table_name": "MATILLION_SCHEDULES",
+	"alias": "m",
+    "except_columns": ["SOURCE_SYSTEM_UID","RECORD_ACTIVE_BEGIN_TS","RECORD_ACTIVE_END_TS","TRADENAME","PACKAGE_CODE_DESCR","BASIC_MATERIAL","PRODUCT_HIERARCHY","CARRIER","CARRIER_NAME","APPLICATION", "APPLICATION_DESCR","SUSTAINABILITY","SUSTAINABILITY_DESCR", "SUSTAINABILITY_CATEGORY","SUSTAINABILITY_CATEGORY_DESC","KEY_EFFECT_DESCR","UL_PROSPECTOR","ADDITIVE_FUNCTION","INDUSTRY_STD_DESCR","CHANGED_ON","PROJECT_ID","MATERIAL_ATTRIBUTES", "CONVERSION_FACTOR_TO_KG","PRODUCT_GROUP","GROUP_TYPE","CAS_NUMBER", "COLOR_INDEX"]
+} %}
+
+{{ dbt_utils.get_filtered_columns_in_relation(
+    from=source(source_entry.source_name, source_entry.table_name),
+    except=except_columns
+) }}
