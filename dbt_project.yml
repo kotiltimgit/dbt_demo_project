@@ -26,6 +26,7 @@ clean-targets: # directories to be removed by `dbt clean`
 on-run-end:
   - "{{ test_executions_result(schema='DBT_CUSTOM_LOGGING') }}"
   - "{{ dbt_artifacts.upload_results(results) }}"
+  - "{{ audit_logging_di_macro() }}"
   
 # Configuring models
 # Full documentation: https://docs.getdbt.com/docs/configuring-models
@@ -50,6 +51,7 @@ models:
   elementary:
     +database: DBT_DB_DEV 
     +schema: DBT_ELEMENTARY_LOGGING
+    
 
 tests:
   dbt_demo_project:

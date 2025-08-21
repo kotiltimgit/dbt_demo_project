@@ -1,7 +1,6 @@
 {{
     config(
-        pre_hook="{{ audit_logging() }}"
+        pre_hook="{{ audit_logging_prehook() }}"
     )
 }}
-
-select 1
+{{ test_audit() }}

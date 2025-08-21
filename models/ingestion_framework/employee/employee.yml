@@ -23,7 +23,7 @@ models:
         pattern:                                            # Pattern of the file
         stage_name: DBT_DB_DEV.SILVER.AWS_STAGE_DICOE                       # External stage name configured in the target data platform
         stage_landing_path: DBT_METADATA/INGESTION_FRAMEWORK            # Landing path where the files are available for loading in external stage
-        stage_archive_path: path/to/the/location            # Archival path where the files need to be moved after successful loading
+        stage_archive_path: DBT_METADATA/ARCHIVE            # Archival path where the files need to be moved after successful loading
         stage_error_path: path/to/the/location              # Error path where the files need to be moved if file loading failed
         file_format: DBT_DB_DEV.SILVER.CSV_FILE_FORMAT                        # File format name configured in the target data platform
         partitioned:                                        # Specify True|False if partition need to be considered while loading
@@ -39,12 +39,11 @@ models:
         database: DBT_DB_DEV                                # Specify the database name of stage table
         schema: BRONZE                                      # Specify the schema name of stage table
         stage_table_name: STG_EMPLOYEE                            # Specify the name of the stage table      
-    config:
-      primary_keys: ['EMPLOYEE_ID']               # Specify the primary key to be used while creating DDL for Raw table
-      database: DBT_DB_DEV                                  # Specify the  database name of raw table
-      schema: BRONZE                                        # Specify the schema name of raw table
-      raw_table_name: EMPLOYEE                                       # Specify the name of raw table
-      pre_hook: "prehook_macro()"
+      raw_table:     
+        primary_keys: ['EMPLOYEE_ID']               # Specify the primary key to be used while creating DDL for Raw table
+        database: DBT_DB_DEV                                  # Specify the  database name of raw table
+        schema: BRONZE                                        # Specify the schema name of raw table
+        raw_table_name: EMPLOYEE                                       # Specify the name of raw table
     columns:
       - name: EMPLOYEE_ID # required               # Specify the column of your target table
         meta:

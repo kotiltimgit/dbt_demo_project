@@ -2,6 +2,10 @@ version: 2
 
 models:
   - name: dynamic_select_model_1
+    columns:
+      - name: id
+        data_tests:
+          - unique
     config:
       transformation:
         source_columns:
@@ -33,4 +37,3 @@ models:
         join_condition: <join_name>
         group_by: enable | disable
         order_by: enable | disable
-        
