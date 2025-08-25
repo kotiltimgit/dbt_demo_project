@@ -2,7 +2,7 @@ version: 2
 
 sources:
   - name: DBT_API_METADATA
-    database: DBT_DB_DEV
+    database: "{{ env_var('DBT_ENV_DB') }}"
     schema: DBT_API_METADATA
     tables:
       - name: DBT_ACCOUNTS

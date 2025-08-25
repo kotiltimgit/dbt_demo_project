@@ -46,10 +46,10 @@ vars:
 
 models:
   dbt_artifacts:
-    +database: DBT_DB_DEV # optional, default is your target database
+    +database: "{{ env_var('DBT_ENV_DB') }}" # optional, default is your target database
     +schema: DBT_ARTIFACT_LOGGING # optional, default is your target schema
   elementary:
-    +database: DBT_DB_DEV 
+    +database: "{{ env_var('DBT_ENV_DB') }}" 
     +schema: DBT_ELEMENTARY_LOGGING
     
 
@@ -57,4 +57,4 @@ tests:
   dbt_demo_project:
     +store_failures: true  # all tests
     +severity: warn  # all tests
-    +database: DBT_DB_DEV
+    +database: "{{ env_var('DBT_ENV_DB') }}"

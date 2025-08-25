@@ -1,9 +1,11 @@
 {% macro audit_logging_insert_macro() %}
+    {# Building Audit Table Relation #}
     {%- set database = var("audit_logging_database", target.database) -%}
     {%- set schema = var("audit_logging_schema", "LOGGING") -%}
     {%- set table_identifier = var("audit_logging_table_name", "DBT_RUN_LOG") -%}
     {%- set relation = database ~ '.' ~ schema ~ '.' ~ table_identifier -%}
 
+    {# Building Create Audit Table Query #}
     {{ log("Executing 'CREATE TABLE SQL' for Audit Table", info=True) }}
     {% call statement('audit_create_table_sql') %}
         CREATE TABLE IF NOT EXISTS {{ relation }} (
@@ -42,6 +44,7 @@
     {% endcall %}
     {{ log("Audit Table '" ~ relation ~ "' Created Successfully", info=True) }}
 
+    {# Building Insert Into Audit Table Query #}
     {%- set insert_content_sql = get_audit_log_insert_content_sql(model) -%}
 
     {{ log("Logging Starting Information for Node '" ~ model.unique_id ~ "'", info=True) }}
@@ -75,6 +78,8 @@
 {% endmacro %}
 
 {% macro get_audit_log_insert_content_sql(model) %}
+    {# By Using Context Variables, Environment Variables, and Snowflake Function #}
+    {# Building Select Query for Audit Insert Macro #}
     SELECT
     '{{ invocation_id }}',
     '{{ env_var('DBT_CLOUD_PROJECT_ID', '') }}',

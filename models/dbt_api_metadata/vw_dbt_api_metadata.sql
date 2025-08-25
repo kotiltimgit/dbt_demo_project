@@ -1,7 +1,7 @@
 {{
     config(
         materialized='view',
-        database='DBT_DB_DEV',
+        database=env_var('DBT_ENV_DB'),
         schema='DBT_API_METADATA',
         alias='VW_DBT_API_METADATA'
     )

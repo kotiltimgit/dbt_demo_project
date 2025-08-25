@@ -1,9 +1,11 @@
 {% macro audit_logging_run_end() %}
+    {# Building Audit Table Relation #}
     {%- set database = var("audit_logging_database", target.database) -%}
     {%- set schema = var("audit_logging_schema", "LOGGING") -%}
     {%- set table_identifier = var("audit_logging_table_name", "DBT_RUN_LOG") -%}
     {%- set relation = database ~ '.' ~ schema ~ '.' ~ table_identifier -%}
 
+    {# Building Create Audit Table Query #}
     {{ log("Executing 'CREATE TABLE SQL' for Audit Table", info=True) }}
     {% call statement('audit_create_table_sql') %}
         CREATE TABLE IF NOT EXISTS {{ relation }} (
@@ -42,6 +44,7 @@
     {% endcall %}
     {{ log("Audit Table '" ~ relation ~ "' Created Successfully", info=True) }}
 
+    {# Building Insert Into Audit Table Query #}
     {%- set results_content_sql = get_audit_log_run_results_content_sql() -%}
 
     {{ log("Logging Completion Information from Results Context", info=True) }}
@@ -86,6 +89,8 @@
 {% endmacro %}
 
 {% macro get_audit_log_run_results_content_sql() %}
+    {# By Using Context Variables, Environment Variables, and Snowflake Function #}
+    {# Building Select Query for Audit Run End Macro #}
     {% set select_sql %}
     SELECT
         $1,

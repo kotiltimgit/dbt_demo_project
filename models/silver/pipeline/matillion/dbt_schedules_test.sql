@@ -4,7 +4,7 @@
         materialized='incremental',
         incremental_strategy = 'merge',
         alias='JOB_SCHEDULE',
-        database='DBT_DB_DEV',
+        database=env_var('DBT_ENV_DB'),
         schema='SILVER',
         unique_key=['PLATFORM_NAME','SCHEDULE_NAME','JOB_NAME'],
         merge_exclude_columns=['JOB_SCHEDULE_ID','INSERTED_BY','INSERT_DATE']

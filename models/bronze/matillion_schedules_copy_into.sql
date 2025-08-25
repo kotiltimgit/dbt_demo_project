@@ -1,4 +1,4 @@
-/*
+{#
 
 -------------------------------------------------
 Properties needs to be defined in config() block
@@ -16,13 +16,13 @@ Properties needs to be defined in config() block
 10. copy_options -- {'on_error': '<value>', 'match_by_column_name': '<value>', .....}   (Optional)
 11. validation_mode -- '<string>'   (Optional)
 
-*/
+#}
 
 {{
     config(
         materialized='copy_into_materialization',
         alias='MATILLION_SCHEDULES',
-        database='DBT_DB_DEV',
+        database=env_var('DBT_ENV_DB'),
         schema='BRONZE',
         external_stage='DBT_DB_DEV.BRONZE.AWS_STAGE',
         location_path='MATILLION_METADATA/CSV/Schedule API Endpoints.csv',

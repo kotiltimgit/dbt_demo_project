@@ -2,7 +2,7 @@
     config(
         materialized='dummy_materialization',
         alias='DEPARTMENT',
-        database='DBT_DB_DEV',
+        database=env_var('DBT_ENV_DB'),
         schema='BRONZE'
     )
 }}

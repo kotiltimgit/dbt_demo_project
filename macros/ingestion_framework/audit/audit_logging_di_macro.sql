@@ -1,6 +1,66 @@
+{% macro audit_logging_di_macro() %}
+    {# Building Audit Table Relation #}
+    {%- set database = var("audit_logging_database", target.database) -%}
+    {%- set schema = var("audit_logging_schema", "LOGGING") -%}
+    {%- set table_identifier = var("audit_logging_table_name", "DBT_RUN_LOG") -%}
+    {%- set relation = database ~ '.' ~ schema ~ '.' ~ table_identifier -%}
+
+    {# Building Delete Invocation From Audit Table Query #}
+    {{ log("Deleting this Invocation's Log to Insert Complete Information from Results Context", info=True) }}
+    {% call statement('invocation_result_delete_sql') %}
+        DELETE FROM {{ relation }}
+        WHERE INVOCATION_ID = '{{ invocation_id }}'
+        ;
+    {% endcall %}
+
+    {# Building Insert Into Audit Table Query #}
+    {%- set results_content_sql = get_audit_log_results_content_sql() -%}
+
+    {{ log("Logging Completion Information from Results Context", info=True) }}
+    {% call statement('invocation_result_insert_sql') %}
+        INSERT INTO {{ relation }} (
+            INVOCATION_ID,
+            PROJECT_ID,
+            PROJECT_NAME,
+            ENVIRONMENT_ID,
+            ENVIRONMENT_NAME,
+            JOB_ID,
+            JOB_NAME,
+            OBJECT_UID,
+            OBJECT_NAME,
+            OBJECT_TYPE,
+            {# OBJECT_STATUS, #}
+            {# OBJECT_START_TIME, #}
+            {# OBJECT_END_TIME, #}
+            RUN_START_TIME,
+            WAS_FULL_REFRESH,
+            THREAD_ID,
+            RUN_STATUS,
+            COMPILE_START_TIME,
+            RUN_END_TIME,
+            DURATION,
+            {# SOURCE_RECORD_COUNT, #}
+            {# INSERT_RECORD_COUNT, #}
+            {# UPDATE_RECORD_COUNT, #}
+            {# ERROR_RECORD_COUNT, #}
+            MATERIALIZATION,
+            DATABASE_NAME,
+            SCHEMA,
+            ALIAS,
+            ERROR_MESSAGE,
+            ADAPTER_RESPONSE
+        )
+        {{ results_content_sql }}
+        ;
+    {% endcall %}
+
+{% endmacro %}
+
 {% macro get_audit_log_results_content_sql() %}
     {%- set supported_resource_types = ['model', 'seed', 'snapshot'] -%}
 
+    {# By Using Context Variables, Environment Variables, and Snowflake Function #}
+    {# Building Select Query for Audit DI Macro #}
     {% set select_sql %}
     SELECT
         $1,
@@ -78,60 +138,5 @@
     {% endset %}
 
     {{ select_sql }}
-
-{% endmacro %}
-
-{% macro audit_logging_di_macro() %}
-    {%- set database = var("audit_logging_database", target.database) -%}
-    {%- set schema = var("audit_logging_schema", "LOGGING") -%}
-    {%- set table_identifier = var("audit_logging_table_name", "DBT_RUN_LOG") -%}
-    {%- set relation = database ~ '.' ~ schema ~ '.' ~ table_identifier -%}
-
-    {{ log("Deleting this Invocation's Log to Insert Complete Information from Results Context", info=True) }}
-    {% call statement('invocation_result_delete_sql') %}
-        DELETE FROM {{ relation }}
-        WHERE INVOCATION_ID = '{{ invocation_id }}'
-        ;
-    {% endcall %}
-
-    {%- set results_content_sql = get_audit_log_results_content_sql() -%}
-
-    {{ log("Logging Completion Information from Results Context", info=True) }}
-    {% call statement('invocation_result_insert_sql') %}
-        INSERT INTO {{ relation }} (
-            INVOCATION_ID,
-            PROJECT_ID,
-            PROJECT_NAME,
-            ENVIRONMENT_ID,
-            ENVIRONMENT_NAME,
-            JOB_ID,
-            JOB_NAME,
-            OBJECT_UID,
-            OBJECT_NAME,
-            OBJECT_TYPE,
-            {# OBJECT_STATUS, #}
-            {# OBJECT_START_TIME, #}
-            {# OBJECT_END_TIME, #}
-            RUN_START_TIME,
-            WAS_FULL_REFRESH,
-            THREAD_ID,
-            RUN_STATUS,
-            COMPILE_START_TIME,
-            RUN_END_TIME,
-            DURATION,
-            {# SOURCE_RECORD_COUNT, #}
-            {# INSERT_RECORD_COUNT, #}
-            {# UPDATE_RECORD_COUNT, #}
-            {# ERROR_RECORD_COUNT, #}
-            MATERIALIZATION,
-            DATABASE_NAME,
-            SCHEMA,
-            ALIAS,
-            ERROR_MESSAGE,
-            ADAPTER_RESPONSE
-        )
-        {{ results_content_sql }}
-        ;
-    {% endcall %}
 
 {% endmacro %}

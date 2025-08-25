@@ -115,7 +115,7 @@
         {% call statement("raw_table_merge_into_sql") %}
             merge into {{ raw_table_relation }} as target
             using (
-                select
+                select distinct
                 {% for col in columns_definition.values() %}
                     {% if col.meta.transformation_logic %}
                         {{ col.meta.transformation_logic }} as {{ col.name }}{% if not loop.last %}, {% endif %}

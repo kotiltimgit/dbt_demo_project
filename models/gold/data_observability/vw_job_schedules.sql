@@ -3,7 +3,7 @@
 {{
     config(
         materialized='view', 
-        database='DBT_DB_DEV',
+        database=env_var('DBT_ENV_DB'),
         schema='GOLD',
         alias='VW_JOB_SCHEDULES'
     )

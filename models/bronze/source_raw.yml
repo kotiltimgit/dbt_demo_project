@@ -2,7 +2,7 @@ version: 2
 
 sources:
   - name: MATILLION
-    database: DBT_DB_DEV
+    database: "{{ env_var('DBT_ENV_DB') }}"
     schema: BRONZE
     tables:
       - name: MATILLION_SCHEDULES

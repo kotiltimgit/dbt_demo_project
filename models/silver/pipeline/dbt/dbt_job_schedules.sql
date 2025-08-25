@@ -2,7 +2,7 @@
     config(
         materialized='custom_merge_material',
         alias=var('DBT_ALIAS_NAME'),
-        database='DBT_DB_DEV',
+        database=env_var('DBT_ENV_DB'),
         schema='SILVER',
         unique_key=['PLATFORM_NAME','SCHEDULE_NAME','JOB_NAME'],
         exclude_update=['JOB_SCHEDULE_ID','INSERTED_BY','INSERT_DATE'],
