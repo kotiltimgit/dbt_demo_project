@@ -1,3 +1,4 @@
+{{ ingestion_partition_csv_files_macro() }}
 SELECT
     '{{ invocation_id }}' as invocation,
     '{{ env_var('DBT_CLOUD_PROJECT_ID', '') }}' as project_id,

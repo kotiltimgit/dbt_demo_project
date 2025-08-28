@@ -60,7 +60,7 @@
                             file.{{ col.meta.source_column_position }}{% if not loop.last %}, {% endif %}
                         {% endif %}
                     {% endfor %}
-                    from '@{{ stage_name }}/{{ location_path }}{% if file_name %}/{{ file_name }}{% endif %}' file
+                    from '@{{ stage_name }}/{{ location_path }}/{% if file_name %}{{ file_name }}{% endif %}' file
                 )
             {% if files -%}
             files = ({{ files | trim('[]') }})
@@ -161,7 +161,7 @@
                             file.{{ col.meta.source_column_position }}{% if not loop.last %}, {% endif %}
                         {% endif %}
                     {% endfor %}
-                    from '@{{ stage_name }}/{{ location_path }}{% if file_name %}/{{ file_name }}{% endif %}' file
+                    from '@{{ stage_name }}/{{ location_path }}/{% if file_name %}{{ file_name }}{% endif %}' file
                 )
             {% if files -%}
             files = ({{ files | trim('[]') }})
