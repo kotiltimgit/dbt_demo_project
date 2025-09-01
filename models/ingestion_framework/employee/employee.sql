@@ -9,8 +9,8 @@
 
 {{ audit_logging_insert_macro() }}
 
-{{ ingestion_csv_macro(model) }}
+{{ ingestion_csv_macro() }}
 
-{{ file_archive_macro(model) }}
+{{ file_archive_macro() }}
 
 {{ audit_logging_update_macro() }}

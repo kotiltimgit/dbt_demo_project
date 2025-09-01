@@ -1,4 +1,4 @@
-{% macro ingestion_csv_macro(model) %}
+{% macro ingestion_csv_macro() %}
     {% if execute %}
     {# Log Message #}
     {{ log('INGESTION FRAMEWORK STARTED', info=True) }}
@@ -17,7 +17,7 @@
     {%- set stage_name = model.meta.source_location_conf.get('stage_name') -%}
     {#
     For single file: Path must be point out to the file (e.g. - 'path/to/the/file.csv' [OR] 'path/to/the/file.json' [OR] .....)
-    For multiple files: Path must be point out to the folder/directory (e.g. - 'path/to/the/directory')
+    For multiple files: Path must be point out to the folder/directory/ (e.g. - 'path/to/the/directory/')
     #}
     {%- set location_path = model.meta.source_location_conf.get('stage_landing_path') -%}
     {%- set file_name = model.meta.source_location_conf.get('filename') -%}
@@ -51,17 +51,17 @@
         {{ log("Executing 'COPY INTO SQL' for Stage Table", info=True) }}
         {% call statement("stage_table_copy_into_sql") %}
             copy into {{ stage_table_relation }}({{ columns_definition.values() | map(attribute='name') | join(', ') }})
-                from (
-                    select
-                    {% for col in columns_definition.values() %}
-                        {% if col.meta.copy_transformation_logic %}
-                            {{ col.meta.copy_transformation_logic | replace(col.meta.source_column_position, "file." ~ col.meta.source_column_position) }}{% if not loop.last %}, {% endif %}
-                        {% else %}
-                            file.{{ col.meta.source_column_position }}{% if not loop.last %}, {% endif %}
-                        {% endif %}
-                    {% endfor %}
-                    from '@{{ stage_name }}/{{ location_path }}/{% if file_name %}{{ file_name }}{% endif %}' file
-                )
+            from (
+                select
+                {% for col in columns_definition.values() %}
+                    {% if col.meta.copy_transformation_logic %}
+                        {{ col.meta.copy_transformation_logic | replace(col.meta.source_column_position, "file." ~ col.meta.source_column_position) }}{% if not loop.last %}, {% endif %}
+                    {% else %}
+                        file.{{ col.meta.source_column_position }}{% if not loop.last %}, {% endif %}
+                    {% endif %}
+                {% endfor %}
+                from '@{{ stage_name }}/{{ location_path }}/{% if file_name %}{{ file_name }}{% endif %}' file
+            )
             {% if files -%}
             files = ({{ files | trim('[]') }})
             {%- endif -%}
@@ -135,10 +135,10 @@
             {%- endfor %}
         
             when not matched then
-            insert(
+            insert (
                 {{ columns_definition.values() | map(attribute='name') | join(', ') }}
             )
-            values(
+            values (
                 {% for column_name in columns_definition.values() -%}
                     source.{{ column_name.name }}
                     {%- if not loop.last %}, {%- endif %}
@@ -184,18 +184,10 @@
 
 {% endmacro %}
 
-
 {% macro ddl_column_definition(column_definition, primary_key_columns) %}
     {% for col_def in column_definition.values() %}
         {{ col_def.name }} {{ col_def.meta.sql_column_datatype }},
     {% endfor %}
     primary key ({{ primary_key_columns | join(", ") }})
-{% endmacro %}
 
-{% macro select_clause_create(column_definition) %}
-    select
-    {% for col_def in column_definition.values() %}
-        {{ col_def.name }}{% if not loop.last %},{% endif %}
-    {% endfor %}
-    
 {% endmacro %}

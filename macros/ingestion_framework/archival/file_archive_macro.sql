@@ -1,4 +1,4 @@
-{% macro file_archive_macro(model) %}
+{% macro file_archive_macro() %}
     {% if execute %}
     {# Log message #}
     {{ log('File Archive Macro', info=True) }}

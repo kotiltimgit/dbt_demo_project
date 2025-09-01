@@ -1,7 +1,7 @@
 {{
     config(
         materialized='dummy_materialization',
-        alias='DEPARTMENT',
+        alias='APPOINTMENT',
         database=env_var('DBT_ENV_DB'),
         schema='BRONZE'
     )
@@ -9,8 +9,8 @@
 
 {{ audit_logging_insert_macro() }}
 
-{{ ingestion_csv_macro() }}
+{{ ingestion_json_macro() }}
 
-{{ file_archive_macro() }}
+{#{{ file_archive_macro() }}#}
 
 {{ audit_logging_update_macro() }}
