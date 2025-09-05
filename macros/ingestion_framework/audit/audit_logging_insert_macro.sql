@@ -106,8 +106,7 @@
 
 
 {% macro test_audit() %}
-    {{ log("FLAG ---> " ~ flags.WHICH, info=True) }}
-    select '{{ invocation_id }}'
+    {{ log("Model ---> " ~ model.unique_id, info=True) }}
 {% endmacro %}
 
 {% macro test_3() %}

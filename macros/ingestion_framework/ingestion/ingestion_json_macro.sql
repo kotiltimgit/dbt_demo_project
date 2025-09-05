@@ -4,9 +4,9 @@
     {{ log('INGESTION FRAMEWORK STARTED', info=True) }}
 
     {# Variable Declaration - Stage Table #}
-    {%- set stg_table_name = model.meta.stage_table.get('stage_table_name') -%}
-    {%- set stg_schema = model.meta.stage_table.get('schema') -%}
-    {%- set stg_database = model.meta.stage_table.get('database') -%}
+    {%- set stg_table_name = model.meta.stage_table.get('stage_table_name', '') -%}
+    {%- set stg_schema = model.meta.stage_table.get('schema', '') -%}
+    {%- set stg_database = model.meta.stage_table.get('database', '') -%}
     {%- set stage_table_relation = stg_database ~ '.' ~ stg_schema ~ '.' ~ stg_table_name -%}
 
     {%- set columns_definition = model.get('columns') -%}
@@ -28,109 +28,142 @@
     {%- set copy_options = model.meta.source_location_conf.get('copy_options') -%}
     {%- set validation_mode = model.meta.source_location_conf.get('validation_mode') -%}
 
-    {# Building Create Stage Table Query #}
-    {{ log("Executing 'CREATE TABLE SQL' for Stage Table", info=True) }}
-    {% call statement('stage_table_create_sql') %}
-        create table if not exists {{ stage_table_relation }} (
-            RAW_DATA VARIANT
-        )
-        ;
-    {% endcall %}
-
-    {# Building Truncate Stage Table Query #}
-    {{ log("Executing 'TRUNCATE TABLE SQL' for Stage Table", info=True) }}
-    {% call statement('stage_table_truncate_sql') %}
-        truncate table {{ stage_table_relation }}
-        ;
-    {% endcall %}
-
-    {# Building Copy Into Stage Table Query #}
-    {{ log("Executing 'COPY INTO SQL' for Stage Table", info=True) }}
-    {% call statement("stage_table_copy_into_sql") %}
-        copy into {{ stage_table_relation }}
-        from '@{{ stage_name }}/{{ location_path }}/{% if file_name %}{{ file_name }}{% endif %}'
-        {% if files -%}
-        files = ({{ files | trim('[]') }})
-        {%- endif -%}
-        {% if pattern -%}
-        pattern = '{{ pattern }}'
-        {%- endif -%}
-        file_format = (format_name = '{{ file_format_name }}')
-        {% if copy_options -%}
-        {{ copy_options }}
-        {% endif -%}
-        {% if validation_mode -%}
-        validation_mode = '{{ validation_mode }}'
-        {%- endif -%}
-        ;
-    {% endcall %}
-
     {# Variable Declaration - Raw Table #}
     {%- set raw_table_name = model.meta.raw_table.get('raw_table_name') -%}
     {%- set raw_schema = model.meta.raw_table.get('schema') -%}
     {%- set raw_database = model.meta.raw_table.get('database') -%}
     {%- set raw_table_relation = raw_database ~ '.' ~ raw_schema ~ '.' ~ raw_table_name -%}
 
-    {# Building Column DDL for Raw Table #}
-    {%- set column_ddl = ddl_column_definition(columns_definition, primary_keys) -%}
+    {# Building Create Stage Table Query #}
+    {% if stage_table_flag %}
+        {{ log("Executing 'CREATE TABLE SQL' for Stage Table", info=True) }}
+        {% call statement('stage_table_create_sql') %}
+            create table if not exists {{ stage_table_relation }} (
+                RAW_DATA VARIANT
+            )
+            ;
+        {% endcall %}
 
-    {# Building Create Raw Table Query #}
-    {{ log("Executing 'CREATE TABLE SQL' for Raw Table", info=True) }}
-    {% call statement('raw_table_create_sql') %}
-        create table if not exists {{ raw_table_relation }} (
-            {{ column_ddl }}
-        )
-        ;
-    {% endcall %}
+        {# Building Truncate Stage Table Query #}
+        {{ log("Executing 'TRUNCATE TABLE SQL' for Stage Table", info=True) }}
+        {% call statement('stage_table_truncate_sql') %}
+            truncate table {{ stage_table_relation }}
+            ;
+        {% endcall %}
 
-    {# Building Merge Into Raw Table Query #}
-    {%- set join_condition = [] -%}
-    {% if primary_keys is sequence and primary_keys is not mapping and primary_keys is not string %}
-        {% for key in primary_keys %}
-            {% set this_key_match %}
-                target."{{ key }}" = source."{{ key }}"
+        {# Building Copy Into Stage Table Query #}
+        {{ log("Executing 'COPY INTO SQL' for Stage Table", info=True) }}
+        {% call statement("stage_table_copy_into_sql") %}
+            copy into {{ stage_table_relation }}
+            from '@{{ stage_name }}/{{ location_path }}/{% if file_name %}{{ file_name }}{% endif %}'
+            {% if files -%}
+            files = ({{ files | trim('[]') }})
+            {%- endif -%}
+            {% if pattern -%}
+            pattern = '{{ pattern }}'
+            {%- endif -%}
+            file_format = (format_name = '{{ file_format_name }}')
+            {% if copy_options -%}
+            {{ copy_options }}
+            {% endif -%}
+            {% if validation_mode -%}
+            validation_mode = '{{ validation_mode }}'
+            {%- endif -%}
+            ;
+        {% endcall %}
+
+        {# Building Column DDL for Raw Table #}
+        {%- set column_ddl = ddl_column_definition(columns_definition, primary_keys) -%}
+
+        {# Building Create Raw Table Query #}
+        {{ log("Executing 'CREATE TABLE SQL' for Raw Table", info=True) }}
+        {% call statement('raw_table_create_sql') %}
+            create table if not exists {{ raw_table_relation }} (
+                {{ column_ddl }}
+            )
+            ;
+        {% endcall %}
+
+        {# Building Merge Into Raw Table Query #}
+        {%- set join_condition = [] -%}
+        {% if primary_keys is sequence and primary_keys is not mapping and primary_keys is not string %}
+            {% for key in primary_keys %}
+                {% set this_key_match %}
+                    target."{{ key }}" = source."{{ key }}"
+                {% endset %}
+                {% do join_condition.append(this_key_match) %}
+            {% endfor %}
+        {% else %}
+            {% set unique_key_match %}
+                target."{{ primary_keys }}" = source."{{ primary_keys }}"
             {% endset %}
-            {% do join_condition.append(this_key_match) %}
-        {% endfor %}
-    {% else %}
-        {% set unique_key_match %}
-            target."{{ primary_keys }}" = source."{{ primary_keys }}"
-        {% endset %}
-        {% do join_condition.append(unique_key_match) %}
-    {% endif %}
+            {% do join_condition.append(unique_key_match) %}
+        {% endif %}
 
-    {%- set select_clause, lateral_flatten = get_select_clause(columns_definition, flatten_keys) -%}
+        {%- set select_clause, lateral_flatten = get_select_clause(columns_definition, flatten_keys) -%}
 
-    {{ log("Executing 'MERGE INTO SQL' for Raw Table", info=True) }}
-    {% call statement("raw_table_merge_into_sql") %}
-        merge into {{ raw_table_relation }} as target
-        using (
-            select distinct
-            {{ select_clause }}
-            from {{ stage_table_relation }} STG,
-            {{ lateral_flatten }}
-        ) as source
-        on {{"(" ~ join_condition | join(") and (") ~ ")"}}
-    
-        when matched then
-        update set
-        {% for column_name in columns_definition.values() -%}
-            target."{{ column_name.name }}" = source."{{ column_name.name }}"
-            {%- if not loop.last %}, {%- endif %}
-        {%- endfor %}
-    
-        when not matched then
-        insert (
-            {{ columns_definition.values() | map(attribute='name') | join(', ') }}
-        )
-        values (
+        {{ log("Executing 'MERGE INTO SQL' for Raw Table", info=True) }}
+        {% call statement("raw_table_merge_into_sql") %}
+            merge into {{ raw_table_relation }} as target
+            using (
+                select distinct
+                {{ select_clause }}
+                from {{ stage_table_relation }} STG,
+                {{ lateral_flatten }}
+            ) as source
+            on {{"(" ~ join_condition | join(") and (") ~ ")"}}
+        
+            when matched then
+            update set
             {% for column_name in columns_definition.values() -%}
-                source.{{ column_name.name }}
+                target."{{ column_name.name }}" = source."{{ column_name.name }}"
                 {%- if not loop.last %}, {%- endif %}
             {%- endfor %}
-        )
-        ;
-    {% endcall %}
+        
+            when not matched then
+            insert (
+                {{ columns_definition.values() | map(attribute='name') | join(', ') }}
+            )
+            values (
+                {% for column_name in columns_definition.values() -%}
+                    source.{{ column_name.name }}
+                    {%- if not loop.last %}, {%- endif %}
+                {%- endfor %}
+            )
+            ;
+        {% endcall %}
+    
+    {# Building Create Raw Table Query #}
+    {% else %}
+        {{ log("Executing 'CREATE TABLE SQL' for Raw Table", info=True) }}
+        {% call statement('raw_table_create_sql') %}
+            create table if not exists {{ raw_table_relation }} (
+                RAW_DATA VARIANT
+            )
+            ;
+        {% endcall %}
+
+        {# Building Copy Into Raw Table Query - in absense of Stage Table #}
+        {{ log("Executing 'COPY INTO SQL' for Raw Table", info=True) }}
+        {% call statement("raw_table_copy_into_sql") %}
+            copy into {{ raw_table_relation }}
+            from '@{{ stage_name }}/{{ location_path }}/{% if file_name %}{{ file_name }}{% endif %}'
+            {% if files -%}
+            files = ({{ files | trim('[]') }})
+            {%- endif -%}
+            {% if pattern -%}
+            pattern = '{{ pattern }}'
+            {%- endif -%}
+            file_format = (format_name = '{{ file_format_name }}')
+            {% if copy_options -%}
+            {{ copy_options }}
+            {% endif -%}
+            {% if validation_mode -%}
+            validation_mode = '{{ validation_mode }}'
+            {%- endif -%}
+            ;
+        {% endcall %}
+    {% endif %}
     
     {% endif %}
 
@@ -142,10 +175,29 @@
     {% set select_clause %}
     {% for col_def in column_definition.values() %}
         {%- set col_path = col_def.meta.path -%}
-        {%- set flatten_key_field_for_lateral = col_path.rsplit(':', 1)[0] -%}
-        {%- set flatten_key_field = col_path if col_path in flatten_keys else flatten_key_field_for_lateral if flatten_key_field_for_lateral in flatten_keys else col_path.split(':')[0] -%}
-        {%- set lateral_flatten_alias = 'lf' ~ (flatten_keys.index(flatten_key_field) + 1) ~ '.value' -%}
-        {{ col_def.meta.path | replace(flatten_key_field, lateral_flatten_alias) }}::{{ col_def.meta.sql_column_datatype }} as {{ col_def.name }}{% if not loop.last %}, {% endif %}
+        {%- set flatten_key_field_rsplit = col_path.rsplit(':', 1)[0] -%}
+        {%- set flatten_key_field_split = col_path.split(':')[0] -%}
+
+        {% if col_path in flatten_keys or flatten_key_field_rsplit in flatten_keys or flatten_key_field_split in flatten_keys %}
+            {% if col_path in flatten_keys %}
+                {%- set flatten_key_field = col_path -%}
+            
+            {% elif flatten_key_field_rsplit in flatten_keys %}
+                {%- set flatten_key_field = flatten_key_field_rsplit -%}
+            
+            {% else %}
+                {%- set flatten_key_field = flatten_key_field_split -%}
+
+            {% endif %}
+            {%- set lateral_flatten_alias = 'lf' ~ (flatten_keys.index(flatten_key_field) + 1) ~ '.value' -%}
+            {{ col_path | replace(flatten_key_field, lateral_flatten_alias) }}::{{ col_def.meta.sql_column_datatype }} as {{ col_def.name }}{% if not loop.last %}, {% endif %}
+        
+        {% else %}
+            STG.RAW_DATA:{{ col_path }}::{{ col_def.meta.sql_column_datatype }} as {{ col_def.name }}{% if not loop.last %}, {% endif %}
+
+        {% endif %}
+        
+        
     {% endfor %}
     {% endset %}
 
