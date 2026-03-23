@@ -24,8 +24,8 @@ clean-targets: # directories to be removed by `dbt clean`
   - "dbt_packages"
 
 on-run-end:
-  - "{{ test_executions_result(schema='DBT_CUSTOM_LOGGING') }}"
-  - "{{ dbt_artifacts.upload_results(results) }}"
+- "{{ test_executions_result(schema='DBT_CUSTOM_LOGGING') }}"
+- "{{ dbt_artifacts.upload_results(results) }}"
   
 # Configuring models
 # Full documentation: https://docs.getdbt.com/docs/configuring-models
@@ -60,9 +60,4 @@ tests:
 seeds:
   database: DBT_DB_DEV
   schema: BRONZE
-  
-vars:
-  dbt_demo_project:
-    MAT_ALIAS_NAME: null
-    DBT_ALIAS_NAME: null
 
