@@ -10,20 +10,20 @@
     {%- set target_relation = database ~ '.' ~ schema ~ '.' ~ table_name -%}
 
     -- external stage
-    {%- set stage_name = config.require('external_stage') -%}
+    {%- set stage_name = config.meta_require('external_stage') -%}
     -- For single file: Path must be point out to the file (e.g. - 'path/to/the/file.csv' [OR] 'path/to/the/file.json' [OR] .....)
     -- For multiple files: Path must be point out to the folder/directory (e.g. - 'path/to/the/directory')
-    {%- set location_path = config.require('location_path') -%}
-    {%- set files = config.get('files', default=None) -%}
-    {%- set pattern = config.get('pattern', default=None) -%}
+    {%- set location_path = config.meta_require('location_path') -%}
+    {%- set files = config.meta_get('files', default=None) -%}
+    {%- set pattern = config.meta_get('pattern', default=None) -%}
     --{%- set external_stage = '@' ~ stage_name ~ '/' ~ stage_file_path -%}
 
     -- file format
     {%- set file_format_name = config.require('file_format') -%}
     -- copy options
-    {%- set copy_options = config.get('copy_options', default=None) -%}
+    {%- set copy_options = config.meta_get('copy_options', default=None) -%}
     -- validation_mode
-    {%- set validation_mode = config.get('validation_mode', default=None) -%}
+    {%- set validation_mode = config.meta_get('validation_mode', default=None) -%}
 
     {% call statement("main") %}
         copy into {{ target_relation }}

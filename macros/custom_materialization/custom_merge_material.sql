@@ -10,9 +10,9 @@
   {%- set unique_key = config.require('unique_key') -%}
   {%- set target = database ~ '.' ~ schema ~ '.' ~ table_name -%}
  
-  {%- set update_exclude_columns = config.require('exclude_update') -%}
+  {%- set update_exclude_columns = config.meta_require('exclude_update') -%}
   {%- set update_exclude_columns_list = "('" + update_exclude_columns | join("', '") + "')" -%}
-  {%- set insert_exclude_columns = config.require('exclude_insert') -%}
+  {%- set insert_exclude_columns = config.meta_require('exclude_insert') -%}
   {%- set insert_exclude_columns_list = "('" + insert_exclude_columns | join("', '") + "')" -%}
 
   -- extracting the target table columns and storing in list

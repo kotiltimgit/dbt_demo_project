@@ -1,14 +1,11 @@
-{{
-    config(
-        materialized='custom_merge_material',
-        alias=var('DBT_ALIAS_NAME'),
-        database='DBT_DB_DEV',
-        schema='SILVER',
-        unique_key=['PLATFORM_NAME','JOB_NAME'],
-        exclude_update=['JOB_SCHEDULE_ID','INSERTED_BY','INSERT_DATE'],
-        exclude_insert=['JOB_SCHEDULE_ID']
-    )
-}}
+{{ config(
+    materialized="custom_merge_material", 
+    alias=var('DBT_ALIAS_NAME'), 
+    database="DBT_DB_DEV", 
+    schema="SILVER", 
+    unique_key=['PLATFORM_NAME','JOB_NAME'], 
+    meta={'exclude_update': ['JOB_SCHEDULE_ID','INSERTED_BY','INSERT_DATE'], 'exclude_insert': ['JOB_SCHEDULE_ID']}
+) }}
 
 
 SELECT 

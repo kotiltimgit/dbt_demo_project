@@ -1,0 +1,8 @@
+version: 2
+
+sources:
+  - name: EMPLOYEE_RAW
+    database: DBT_DB_DEV
+    schema: BRONZE
+    tables:
+      - name: EMPLOYEE

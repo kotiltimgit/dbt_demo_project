@@ -18,16 +18,12 @@ Properties needs to be defined in config() block
 
 */
 
-{{
-    config(
-        materialized='copy_into_materialization',
-        alias='MATILLION_SCHEDULES',
-        database='DBT_DB_DEV',
-        schema='BRONZE',
-        external_stage='DBT_DB_DEV.BRONZE.DICOE_AWS_STAGE',
-        location_path='MATILLION_METADATA/CSV/Schedule API Endpoints.csv',
-        file_format='DBT_DB_DEV.BRONZE.CSV_FORMAT',
-        copy_options={'on_error': 'CONTINUE', 'match_by_column_name': 'CASE_INSENSITIVE'}
-    )
-}}
+{{ config(
+    materialized="copy_into_materialization", 
+    alias="MATILLION_SCHEDULES", 
+    database="DBT_DB_DEV", 
+    schema="BRONZE", 
+    file_format="DBT_DB_DEV.BRONZE.CSV_FORMAT", 
+    meta={'external_stage': 'DBT_DB_DEV.BRONZE.DICOE_AWS_STAGE', 'location_path': 'MATILLION_METADATA/CSV/Schedule API Endpoints.csv', 'copy_options': {'on_error': 'CONTINUE', 'match_by_column_name': 'CASE_INSENSITIVE'}}
+) }}
 

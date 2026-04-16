@@ -17,16 +17,14 @@ test-paths: ["tests"]
 seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
-
-target-path: "target" # directory which will store compiled SQL files
 clean-targets: # directories to be removed by `dbt clean`
   - "target"
   - "dbt_packages"
 
 on-run-end:
-- "{{ test_executions_result(schema='DBT_CUSTOM_LOGGING') }}"
-- "{{ dbt_artifacts.upload_results(results) }}"
-  
+  - "{#{ test_executions_result(schema='DBT_CUSTOM_LOGGING') }#}"
+  - "{#{ dbt_artifacts.upload_results(results) }#}"
+
 # Configuring models
 # Full documentation: https://docs.getdbt.com/docs/configuring-models
 
@@ -39,16 +37,16 @@ on-run-end:
 
 vars:
   dbt_demo_project:
-    MAT_ALIAS_NAME: null
-    DBT_ALIAS_NAME: null
- 
+    MAT_ALIAS_NAME:
+    DBT_ALIAS_NAME:
+
 
 models:
   dbt_artifacts:
     +database: DBT_DB_DEV # optional, default is your target database
     +schema: DBT_ARTIFACT_LOGGING # optional, default is your target schema
   elementary:
-    +database: DBT_DB_DEV 
+    +database: DBT_DB_DEV
     +schema: DBT_ELEMENTARY_LOGGING
 
 tests:
@@ -58,6 +56,7 @@ tests:
     +database: DBT_DB_DEV
 
 seeds:
-  database: DBT_DB_DEV
-  schema: BRONZE
-
+  +database: DBT_DB_DEV
+  +schema: BRONZE
+flags:
+  require_generic_test_arguments_property: true

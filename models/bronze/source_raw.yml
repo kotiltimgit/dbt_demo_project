@@ -17,7 +17,7 @@ sources:
               target_columns:
             copy_options:
               on_error: CONTINUE
-              match_by_column_name: CASE_INSENSITIVE        
+              match_by_column_name: CASE_INSENSITIVE
         columns:
           - name: NAME
             tests:
@@ -35,4 +35,5 @@ sources:
           - name: IGNOREMISFIRES
             tests:
               - accepted_values:
-                  values: ['TRUE', 'FALSE']
+                  arguments:
+                    values: ['TRUE', 'FALSE']

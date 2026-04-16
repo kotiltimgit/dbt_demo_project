@@ -3,17 +3,14 @@ For this model, the below command needs to be passed along with dbt commands
 [   --vars '{MAT_ALIAS_NAME: JOB_SCHEDULES}'   ]
 */
 
-{{
-    config(
-        materialized='custom_merge_material',
-        alias=var('MAT_ALIAS_NAME'),
-        database='DBT_DB_DEV',
-        schema='SILVER',
-        unique_key=['PLATFORM_NAME','SCHEDULE_NAME','JOB_NAME'],
-        exclude_update=['JOB_SCHEDULE_ID','INSERTED_BY','INSERT_DATE'],
-        exclude_insert=['JOB_SCHEDULE_ID']
-    )
-}}
+{{ config(
+    materialized="custom_merge_material", 
+    alias=var('MAT_ALIAS_NAME'), 
+    database="DBT_DB_DEV", 
+    schema="SILVER", 
+    unique_key=['PLATFORM_NAME','SCHEDULE_NAME','JOB_NAME'], 
+    meta={'exclude_update': ['JOB_SCHEDULE_ID','INSERTED_BY','INSERT_DATE'], 'exclude_insert': ['JOB_SCHEDULE_ID']}
+) }}
 
 SELECT 
   'MATILLION' AS PLATFORM_NAME,
