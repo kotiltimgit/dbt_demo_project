@@ -36,6 +36,7 @@ on-run-end:
 # using the `{{ config(...) }}` macro.
 
 vars:
+  region: EMEA
   dbt_demo_project:
     MAT_ALIAS_NAME:
     DBT_ALIAS_NAME:

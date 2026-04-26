@@ -1,6 +1,15 @@
 version: 2
 
 sources:
+  - name: TEST
+    database: DBT_DB_DEV
+    schema: BRONZE
+    tables:
+    - name: STG_EMPLOYEE_EMEA
+    - name: STG_EMPLOYEE_APAC
+    - name: STG_EMPLOYEE_NA
+
+
   - name: MATILLION
     database: DBT_DB_DEV
     schema: BRONZE
